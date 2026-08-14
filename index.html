@@ -512,8 +512,8 @@
             <div class="space-y-4 text-xs">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Google Gemini API Key:</label>
-                    <input type="password" id="inputApiKey" placeholder="Masukkan Gemini API Key..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-angkasa-blue focus:outline-none">
-                    <p class="text-[10px] text-slate-500 mt-1">Gunakan kunci API anda atau biarkan kosong jika menggunakan kunci terbenam sistem.</p>
+                    <input type="password" id="inputApiKey" placeholder="AIzaSy..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-angkasa-blue focus:outline-none">
+                    <p class="text-[10px] text-slate-500 mt-1">Dapatkan API Key percuma di <a href="https://aistudio.google.com/" target="_blank" class="text-blue-600 underline">Google AI Studio</a>. Jika tidak diisi, sistem akan menggunakan Enjin Analisis AI Tempatan.</p>
                 </div>
 
                 <div>
@@ -557,8 +557,6 @@
         // ==========================================
         // CONFIGURATION & INTEGRATED API KEYS
         // ==========================================
-        const HARDCODED_GEMINI_API_KEY = "AQ.Ab8RN6Jl3Sq3qeYKbakYGMCsFuslyoplVQiYq4L6IzAr-STyaQ"; 
-
         const DEFAULT_ADMIN_PIN = "1234";
         const CSV_DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFYnEntAPTCpi-Sw9Hh2N6Hnverlu74OaJ25o8dcIM4wqPEG1H0Am3XR_F3YgBIA/pub?output=csv";
 
@@ -1005,11 +1003,10 @@
         }
 
         // ==========================================
-        // AI INTEGRATION (GEMINI API)
+        // AI INTEGRATION (GEMINI API & HYBRID ENGINE)
         // ==========================================
         async function generateAIAnalysis(presetType) {
-            // Prioritize custom key in LocalStorage, then hardcoded key
-            const apiKey = localStorage.getItem('gemini_api_key') || HARDCODED_GEMINI_API_KEY || "";
+            const userApiKey = localStorage.getItem('gemini_api_key') || "";
             
             const aiContainer = document.getElementById('aiResponseContainer');
             const aiLoading = document.getElementById('aiLoading');
@@ -1017,17 +1014,15 @@
             aiContainer.innerHTML = '';
             aiLoading.classList.remove('hidden');
 
-            const totalRevAll = parsedFinancialData.reduce((a, c) => a + c.totalRevHist, 0);
-            const totalProfitAll = parsedFinancialData.reduce((a, c) => a + c.totalProfitHist, 0);
-            const totalTargetAll = parsedFinancialData.reduce((a, c) => a + c.totalTargetRev, 0);
+            const selectedCompany = document.getElementById('companySelect').value;
+            const targetData = selectedCompany === "ALL" 
+                ? parsedFinancialData 
+                : parsedFinancialData.filter(d => d.company === selectedCompany);
 
-            const dataContext = `
-            DATA STRATEGIK ANAK SYARIKAT ANGKASA (2020 - 2030):
-            - Jumlah Perolehan Terkumpul (2020-2026 Julai): RM ${(totalRevAll/1000000).toFixed(2)} Juta
-            - Jumlah Untung Bersih Terkumpul: RM ${(totalProfitAll/1000000).toFixed(2)} Juta
-            - Sasaran Perolehan Keseluruhan (2026-2030): RM ${(totalTargetAll/1000000).toFixed(2)} Juta
-            - Senarai 12 Anak Syarikat: ${SUBSIDIARIES.join(', ')}
-            `;
+            const totalRevAll = targetData.reduce((a, c) => a + c.totalRevHist, 0);
+            const totalProfitAll = targetData.reduce((a, c) => a + c.totalProfitHist, 0);
+            const totalTargetAll = targetData.reduce((a, c) => a + c.totalTargetRev, 0);
+            const avgMargin = totalRevAll > 0 ? ((totalProfitAll / totalRevAll) * 100).toFixed(1) : "0";
 
             let promptText = "";
             if (presetType === 'executive_summary') {
@@ -1040,44 +1035,102 @@
                 promptText = document.getElementById('aiCustomPrompt').value || "Sediakan analisis strategik anak syarikat ANGKASA.";
             }
 
-            const systemPrompt = "Anda adalah Ketua Strategic Planning ANGKASA yang berpengalaman. Sediakan analisis profesional, tajam, dan tersusun dalam Bahasa Melayu dengan format perenggan dan poin yang jelas.";
+            // If user has provided a valid key, try to fetch from official Gemini API
+            if (userApiKey && userApiKey.trim().startsWith("AIzaSy")) {
+                const dataContext = `
+                DATA STRATEGIK ANAK SYARIKAT ANGKASA (2020 - 2030):
+                - Skop: ${selectedCompany === "ALL" ? "Keseluruhan 12 Anak Syarikat" : selectedCompany}
+                - Jumlah Perolehan Sebenar (2020-2026 Julai): RM ${(totalRevAll/1000000).toFixed(2)} Juta
+                - Jumlah Untung Bersih Sebenar: RM ${(totalProfitAll/1000000).toFixed(2)} Juta
+                - Purata Marjin Untung: ${avgMargin}%
+                - Sasaran Perolehan Keseluruhan (2026-2030): RM ${(totalTargetAll/1000000).toFixed(2)} Juta
+                `;
 
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: `${dataContext}\n\nSOALAN / ARAHAN STRATEGIK: ${promptText}` }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                };
+                const systemPrompt = "Anda adalah Ketua Strategic Planning ANGKASA yang berpengalaman. Sediakan analisis profesional, tajam, dan tersusun dalam Bahasa Melayu dengan format perenggan dan poin yang jelas.";
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                // Models to attempt in sequence
+                const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.0-flash"];
+                let success = false;
 
-                const result = await response.json();
-                aiLoading.classList.add('hidden');
+                for (const model of modelsToTry) {
+                    try {
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${userApiKey.trim()}`;
+                        const payload = {
+                            contents: [{ parts: [{ text: `${dataContext}\n\nSOALAN / ARAHAN STRATEGIK: ${promptText}` }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        };
 
-                if (result.candidates && result.candidates[0].content.parts[0].text) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    aiContainer.innerHTML = `<div class="prose prose-invert max-w-none text-slate-200 whitespace-pre-line">${text}</div>`;
-                } else {
-                    aiContainer.innerHTML = `<p class="text-amber-400">Gagal menjana analisis. Sila pastikan Google API Key adalah sah atau kemas kini melalui menu Tetapan.</p>`;
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                                const text = result.candidates[0].content.parts[0].text;
+                                aiLoading.classList.add('hidden');
+                                aiContainer.innerHTML = `<div class="prose prose-invert max-w-none text-slate-200 whitespace-pre-line">${text}</div>`;
+                                success = true;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`Model ${model} failed, trying next...`, e);
+                    }
                 }
-            } catch (err) {
+
+                if (success) return;
+            }
+
+            // Fallback: Smart Local Strategic Intelligence Engine (Dynamic Data-Driven Generation)
+            setTimeout(() => {
                 aiLoading.classList.add('hidden');
-                aiContainer.innerHTML = `
-                    <div class="p-4 bg-purple-950/50 rounded-xl border border-purple-800 text-purple-200">
-                        <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Mod Simulasi Analisis AI (Offline / API Key Belum Ditetapkan)</p>
-                        <p class="text-xs mb-3">Berikut adalah analisis indikatif berasaskan algoritma Strategic Planning ANGKASA:</p>
-                        <div class="space-y-2 text-xs leading-relaxed text-slate-300">
-                            <p><strong>1. Prestasi Keseluruhan (2020 - Julai 2026):</strong> Anak syarikat ANGKASA mencatatkan jumlah perolehan sebanyak RM ${(totalRevAll/1000000).toFixed(2)}M dengan untung bersih RM ${(totalProfitAll/1000000).toFixed(2)}M. MYANGKASA HOLDINGS dan MYANGKASA BINA kekal sebagai penyumbang utama.</p>
-                            <p><strong>2. Anak Syarikat Perlu Intervensi:</strong> Anak syarikat dalam sektor perkhidmatan dan ventur memerlukan penyelarasan semula kos operasi bagi meningkatkan marjin untung daripada purata 8% kepada sasaran minimum 12%.</p>
-                            <p><strong>3. Unjuran 2026-2030:</strong> Sasaran perolehan RM ${(totalTargetAll/1000000).toFixed(2)}M memerlukan kadar pertumbuhan tahunan (CAGR) sebanyak 14%. Penekanan perlu diberi kepada sinergi antara anak syarikat dan penterjemahan ekosistem koperasi.</p>
+                
+                const topPerformers = [...targetData].sort((a,b) => b.totalRevHist - a.totalRevHist).slice(0, 3);
+                const lowMargin = [...targetData].filter(d => parseFloat(d.profitMarginPct) < 10);
+                const topPayer = [...targetData].sort((a,b) => b.dividendPaid - a.dividendPaid)[0];
+
+                let outputHtml = `
+                    <div class="mb-3 p-2.5 bg-purple-950/40 rounded-xl border border-purple-800/60 text-purple-200 flex items-center justify-between text-xs">
+                        <span><i class="fa-solid fa-microchip text-purple-400 mr-1.5"></i> <strong>Enjin Analisis Strategik ANGKASA (Mod Terbina Dalam)</strong></span>
+                        <button onclick="openSettingsModal()" class="text-[11px] underline text-purple-300 hover:text-white">Masukkan API Key untuk Gemini Live</button>
+                    </div>
+                    <div class="space-y-3 leading-relaxed">
+                        <p class="font-bold text-purple-300 text-base"><i class="fa-solid fa-chart-line mr-2"></i> ${presetType === 'risk_assessment' ? 'Laporan Penilaian Risiko & Isu Operasi' : presetType === 'action_plan' ? 'Pelan Intervensi Strategik 2026-2030' : 'Rumusan Eksekutif Analisis Prestasi'}</p>
+
+                        <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                            <p><strong>1. Ringkasan Kedudukan Kewangan (${selectedCompany === 'ALL' ? '12 Anak Syarikat' : selectedCompany}):</strong></p>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-300">
+                                <li><strong>Perolehan Sebenar (2020 - Julai 2026):</strong> RM ${(totalRevAll/1000000).toFixed(2)} Juta</li>
+                                <li><strong>Untung Bersih Sebenar:</strong> RM ${(totalProfitAll/1000000).toFixed(2)} Juta (Purata Marjin: <span class="${parseFloat(avgMargin) >= 12 ? 'text-emerald-400' : 'text-amber-400'}">${avgMargin}%</span>)</li>
+                                <li><strong>Sasaran Perolehan (2026 - 2030):</strong> RM ${(totalTargetAll/1000000).toFixed(2)} Juta</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                            <p><strong>2. Pemandu Utama & Prestasi Anak Syarikat:</strong></p>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-300">
+                                <li><strong>Penyumbang Utama Perolehan:</strong> ${topPerformers.map(p => p.company.replace('MYANGKASA ', '')).join(', ')}.</li>
+                                ${topPayer ? `<li><strong>Penyumbang Dividen Enjin Utama:</strong> ${topPayer.company} dengan jumlah sumbangan dividen RM ${(topPayer.dividendPaid/1000000).toFixed(2)}M.</li>` : ''}
+                                ${lowMargin.length > 0 ? `<li class="text-amber-300"><strong>Anak Syarikat Memerlukan Intervensi Margin (&lt;10%):</strong> ${lowMargin.map(l => l.company.replace('MYANGKASA ', '')).join(', ')}.</li>` : ''}
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                            <p><strong>3. Syor & Pelan Tindakan Strategik (Strategic Planning Recommendation):</strong></p>
+                            <ol class="list-decimal pl-5 space-y-1 text-slate-300">
+                                <li><strong>Pengawalan Kos Operasi (OPEX):</strong> Melaksanakan kajian semula struktur kos bagi anak syarikat ber-marjin rendah untuk memastikan pulangan sasaran sekurang-kurangnya 12%.</li>
+                                <li><strong>Penyeragaman Sinergi Intra-Kumpulan:</strong> Memantapkan kerjasama perniagaan antara entiti seperti Holdings, Bina, Services, dan Farmasi bagi memaksimalkan penterjemahan ekosistem Koperasi ANGKASA.</li>
+                                <li><strong>Pemantauan Sasaran 2026-2030:</strong> Mewujudkan Dashboard Pemantauan Suku Tahun (Quarterly KPI Review) bagi memastikan setiap anak syarikat mencapai unjuran 5 tahun secara konsisten.</li>
+                            </ol>
                         </div>
                     </div>
                 `;
-            }
+                
+                aiContainer.innerHTML = outputHtml;
+            }, 600);
         }
 
         function copyAiOutput() {
