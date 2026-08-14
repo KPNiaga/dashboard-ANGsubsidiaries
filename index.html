@@ -206,7 +206,7 @@
             </div>
         </section>
 
-        <!-- TAB 1: OVERVIEW (RINGKASAN EKSEKUTIF - LENGKAP DENGAN CARTA, JADUAL, AI ANALYST & ULASAN PENGURUSAN) -->
+        <!-- TAB 1: OVERVIEW -->
         <div id="view-overview" class="tab-content space-y-6">
             
             <!-- Charts Row 1: Historical Trend & Target Projection -->
@@ -314,7 +314,7 @@
                 </div>
             </div>
 
-            <!-- SECTION: AI STRATEGIC ANALYST (INTEGRATED INTO EXECUTIVE SUMMARY) -->
+            <!-- SECTION: AI STRATEGIC ANALYST -->
             <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
                     <div>
@@ -373,7 +373,7 @@
                 </div>
             </div>
 
-            <!-- SECTION: MANAGEMENT REVIEW & COMMENTS (INTEGRATED INTO EXECUTIVE SUMMARY) -->
+            <!-- SECTION: MANAGEMENT REVIEW & COMMENTS -->
             <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-slate-200">
                     <div>
@@ -513,7 +513,7 @@
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Google Gemini API Key:</label>
                     <input type="password" id="inputApiKey" placeholder="Masukkan Gemini API Key..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-angkasa-blue focus:outline-none">
-                    <p class="text-[10px] text-slate-500 mt-1">Gunakan kunci API anda atau biarkan kosong jika menggunakan kunci laluan sistem.</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Gunakan kunci API anda atau biarkan kosong jika menggunakan kunci terbenam sistem.</p>
                 </div>
 
                 <div>
@@ -555,7 +555,7 @@
 
     <script>
         // ==========================================
-        // CONFIGURATION & HARDCODED API KEYS
+        // CONFIGURATION & INTEGRATED API KEYS
         // ==========================================
         const HARDCODED_GEMINI_API_KEY = "AQ.Ab8RN6Jl3Sq3qeYKbakYGMCsFuslyoplVQiYq4L6IzAr-STyaQ"; 
 
@@ -584,7 +584,6 @@
         let isManagementUnlocked = false;
         let currentCharts = {};
 
-        // Dataset generator
         function generateFallbackData() {
             const mockData = [];
             
@@ -647,7 +646,6 @@
             return mockData;
         }
 
-        // Initialize application on DOM ready
         window.onload = function() {
             populateCompanyDropdown();
             loadManagementCommentsLog();
@@ -705,7 +703,6 @@
             fetchCSVData();
         }
 
-        // Main Render Controller
         function renderDashboard() {
             const selectedCompany = document.getElementById('companySelect').value;
             let filtered = parsedFinancialData;
@@ -743,7 +740,6 @@
             renderDashboard();
         }
 
-        // Currency Formatting Helper
         function formatRM(num) {
             if (num >= 1000000) {
                 return `RM ${(num / 1000000).toFixed(2)} M`;
@@ -753,7 +749,6 @@
             return `RM ${num.toLocaleString()}`;
         }
 
-        // Chart 1: Historical Trend
         function renderHistoricalChart(data) {
             const ctx = document.getElementById('chartHistoricalTrend').getContext('2d');
             if (currentCharts.historical) currentCharts.historical.destroy();
@@ -804,7 +799,6 @@
             });
         }
 
-        // Chart 2: Target Projections 2026 - 2030
         function renderTargetChart(data) {
             const ctx = document.getElementById('chartTargetTrend').getContext('2d');
             if (currentCharts.target) currentCharts.target.destroy();
@@ -842,7 +836,6 @@
             });
         }
 
-        // Chart 3: Revenue Share
         function renderRevenueShareChart(data) {
             const ctx = document.getElementById('chartRevenueShare').getContext('2d');
             if (currentCharts.revenueShare) currentCharts.revenueShare.destroy();
@@ -868,7 +861,6 @@
             });
         }
 
-        // Chart 4: Dividend Bar Chart
         function renderDividendChart(data) {
             const ctx = document.getElementById('chartDividendDistribution').getContext('2d');
             if (currentCharts.dividend) currentCharts.dividend.destroy();
@@ -893,7 +885,6 @@
             });
         }
 
-        // Tier List Generator
         function renderSubsidiaryTierList(data) {
             const container = document.getElementById('subsidiaryTierList');
             container.innerHTML = '';
@@ -926,7 +917,6 @@
             });
         }
 
-        // Render Table Data
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -952,7 +942,6 @@
             });
         }
 
-        // Render Targets Breakdown Table
         function renderTargetsTable(data) {
             const tbody = document.getElementById('targetsTableBody');
             tbody.innerHTML = '';
@@ -973,7 +962,6 @@
             });
         }
 
-        // Render Financials Tab Charts
         function renderFinancialsTabCharts(data) {
             const ctx = document.getElementById('chartFinancialBreakdownBar').getContext('2d');
             if (currentCharts.finBreakdown) currentCharts.finBreakdown.destroy();
@@ -995,14 +983,12 @@
             });
         }
 
-        // Table Search Filter
         function filterTable() {
             const query = document.getElementById('tableSearch').value.toLowerCase();
             const filtered = parsedFinancialData.filter(d => d.company.toLowerCase().includes(query));
             renderTable(filtered);
         }
 
-        // Tab Switcher
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
@@ -1022,7 +1008,8 @@
         // AI INTEGRATION (GEMINI API)
         // ==========================================
         async function generateAIAnalysis(presetType) {
-            const apiKey = HARDCODED_GEMINI_API_KEY || localStorage.getItem('gemini_api_key') || "";
+            // Prioritize custom key in LocalStorage, then hardcoded key
+            const apiKey = localStorage.getItem('gemini_api_key') || HARDCODED_GEMINI_API_KEY || "";
             
             const aiContainer = document.getElementById('aiResponseContainer');
             const aiLoading = document.getElementById('aiLoading');
@@ -1075,7 +1062,7 @@
                     const text = result.candidates[0].content.parts[0].text;
                     aiContainer.innerHTML = `<div class="prose prose-invert max-w-none text-slate-200 whitespace-pre-line">${text}</div>`;
                 } else {
-                    aiContainer.innerHTML = `<p class="text-amber-400">Gagal menjana analisis. Sila pastikan Google API Key telah dimasukkan dalam Tetapan.</p>`;
+                    aiContainer.innerHTML = `<p class="text-amber-400">Gagal menjana analisis. Sila pastikan Google API Key adalah sah atau kemas kini melalui menu Tetapan.</p>`;
                 }
             } catch (err) {
                 aiLoading.classList.add('hidden');
@@ -1173,7 +1160,6 @@
             showToast("Ruang ulasan dikunci semula.");
         }
 
-        // Save & Persist Management Review
         function saveManagementComment() {
             const name = document.getElementById('reviewerName').value || "Pengurusan ANGKASA";
             const category = document.getElementById('reviewCategory').value;
@@ -1231,7 +1217,7 @@
         // Settings Modal Handlers
         function openSettingsModal() {
             document.getElementById('settingsModal').classList.remove('hidden');
-            document.getElementById('inputApiKey').value = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('inputApiKey').value = localStorage.getItem('gemini_api_key') || HARDCODED_GEMINI_API_KEY || '';
             document.getElementById('inputAdminPin').value = localStorage.getItem('admin_pin') || DEFAULT_ADMIN_PIN;
         }
 
