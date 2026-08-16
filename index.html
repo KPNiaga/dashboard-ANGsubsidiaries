@@ -274,13 +274,16 @@
                 <h2 class="text-lg font-bold text-white flex items-center">
                     <i class="fa-solid fa-pen-to-square mr-2"></i> Ruang Ulasan Analisa Eksekutif
                 </h2>
-                <div class="text-xs text-slate-300">Mod Boleh Sunting (Editable)</div>
+                <div class="text-xs text-slate-300">Mod Boleh Sunting & Jana AI</div>
             </div>
             <div class="p-0">
                 <textarea id="strategicAnalysisText" class="w-full h-80 p-5 focus:outline-none focus:ring-0 border-none text-slate-700 leading-relaxed resize-y bg-white" placeholder="Sila masukkan ulasan analisa prestasi, rasional penurunan/peningkatan, dan perancangan strategik 2026-2030 di sini..."></textarea>
             </div>
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end no-print">
-                <button onclick="saveAnalysis()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2">
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-end gap-3 no-print">
+                <button id="btnAiGenerate" onclick="generateAIAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Gemini)</span>
+                </button>
+                <button onclick="saveAnalysis()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
                     <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Draf Ulasan (Lokal)</span>
                 </button>
             </div>
@@ -825,6 +828,71 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
             const text = document.getElementById('strategicAnalysisText').value;
             localStorage.setItem('angkasaUlasanAnalisa', text);
             alert("Nota Analisa Strategik telah disimpan ke dalam peranti anda (Local Storage). Ia akan kekal apabila anda membuka semula dashboard ini.");
+        }
+
+        // Fungsi Penjanaan Ulasan Automatik Menggunakan Gemini AI
+        async function generateAIAnalysis() {
+            const btn = document.getElementById('btnAiGenerate');
+            const textarea = document.getElementById('strategicAnalysisText');
+            const selectedEntity = document.getElementById('subsidiaryFilter').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Sedang Menganalisis Data...';
+
+            try {
+                // Kumpul data ringkasan untuk dihantar kepada Gemini API
+                const revenueHist = document.getElementById('kpi-revenue-hist').innerText;
+                const profitHist = document.getElementById('kpi-profit-hist').innerText;
+                const marginHist = document.getElementById('kpi-margin').innerText;
+                const targetRev = document.getElementById('kpi-revenue-target').innerText;
+                const divTotal = document.getElementById('kpi-dividend').innerText;
+
+                const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi berikut bagi entiti: "${selectedEntity}".
+Ringkasan Data Metrik:
+- Perolehan Terkumpul (2020-2026 Jul): ${revenueHist}
+- Untung Bersih Terkumpul: ${profitHist} (${marginHist})
+- Sasaran Perolehan Purata Setahun (2026-2030): ${targetRev}
+- Jumlah Dividen Dibayar: ${divTotal}
+
+Sila sediakan Ulasan Analisa Eksekutif yang profesional, berstruktur, dan relevan dalam Bahasa Melayu. Bahagikan ulasan kepada 3 bahagian utama:
+1. PRESTASI SEBENAR (2020 - 2026 Julai)
+2. PRESTASI DIVIDEN & PULANGAN PELABURAN
+3. UNJURAN STRATEGIK & HALA TUJU (2026 - 2030)
+
+Berikan ulasan yang tajam, rasional perancangan strategik, dan cadangan tindakan (actionable insights).`;
+
+                const systemInstruction = "Anda adalah pakar perancangan strategik korporat untuk Kumpulan ANGKASA Malaysia. Hasilkan laporan yang formal, padat, dan analitis.";
+
+                const apiKey = ""; // API Key disediakan secara automatik oleh persekitaran run-time
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemInstruction }] }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (aiText) {
+                    textarea.value = aiText;
+                    localStorage.setItem('angkasaUlasanAnalisa', aiText);
+                } else {
+                    alert("Gagal menjana ulasan AI. Sila cuba lagi.");
+                }
+            } catch (error) {
+                console.error("AI Generation Error:", error);
+                alert("Berlaku ralat semasa menyambung ke perkhidmatan AI.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Gemini)</span>';
+            }
         }
 
         // Mulakan proses semasa load
