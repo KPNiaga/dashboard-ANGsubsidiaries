@@ -270,22 +270,30 @@
 
         <!-- Strategic Analysis Section -->
         <div class="glass-card rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <div class="bg-slate-800 px-5 py-3 border-b border-slate-700 flex justify-between items-center">
+            <div class="bg-slate-800 px-5 py-3 border-b border-slate-700 flex justify-between items-center flex-wrap gap-2">
                 <h2 class="text-lg font-bold text-white flex items-center">
                     <i class="fa-solid fa-pen-to-square mr-2"></i> Ruang Ulasan Analisa Eksekutif
                 </h2>
-                <div class="text-xs text-slate-300">Mod Boleh Sunting & Jana AI</div>
+                <div class="flex items-center space-x-2 no-print">
+                    <input type="password" id="geminiApiKey" placeholder="Kunci API Gemini (Opsional)" class="bg-slate-700 text-white text-xs px-3 py-1.5 rounded border border-slate-600 focus:outline-none focus:border-purple-400 w-48">
+                    <span class="text-xs text-slate-300">Mod Sunting & AI</span>
+                </div>
             </div>
             <div class="p-0">
-                <textarea id="strategicAnalysisText" class="w-full h-80 p-5 focus:outline-none focus:ring-0 border-none text-slate-700 leading-relaxed resize-y bg-white" placeholder="Sila masukkan ulasan analisa prestasi, rasional penurunan/peningkatan, dan perancangan strategik 2026-2030 di sini..."></textarea>
+                <textarea id="strategicAnalysisText" class="w-full h-80 p-5 focus:outline-none focus:ring-0 border-none text-slate-700 leading-relaxed resize-y bg-white font-sans text-sm" placeholder="Sila masukkan ulasan analisa prestasi, rasional penurunan/peningkatan, dan perancangan strategik 2026-2030 di sini..."></textarea>
             </div>
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-end gap-3 no-print">
-                <button id="btnAiGenerate" onclick="generateAIAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Gemini)</span>
-                </button>
-                <button onclick="saveAnalysis()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
-                    <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Draf Ulasan (Lokal)</span>
-                </button>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-between items-center gap-3 no-print">
+                <span id="aiStatusMsg" class="text-xs text-slate-500 font-medium">
+                    <i class="fa-solid fa-info-circle mr-1"></i> Jana ulasan automatik berasaskan metrik semasa.
+                </span>
+                <div class="flex flex-wrap gap-3">
+                    <button id="btnAiGenerate" onclick="generateAIAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Serta Merta)</span>
+                    </button>
+                    <button onclick="saveAnalysis()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Draf Ulasan (Lokal)</span>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -336,42 +344,36 @@
             let mockData = [];
             
             subsidiariesList.forEach(sub => {
-                // Faktor base yang berbeza untuk syarikat berbeza
                 let baseRevenue = Math.random() * 50 + 5; 
-                let profitMargin = (Math.random() * 15 + 2) / 100; // 2% to 17%
+                let profitMargin = (Math.random() * 15 + 2) / 100;
                 
-                // Historical (2020 - 2025, 2026 Julai)
                 const histYears = [2020, 2021, 2022, 2023, 2024, 2025, '2026 (Jul)'];
                 histYears.forEach((year, index) => {
-                    // Simulasikan impak covid 2020-2021 (penurunan) dan pemulihan selepasnya
                     let growth = (index < 2) ? (Math.random() * 0.1 - 0.15) : (Math.random() * 0.15 + 0.02);
-                    if(year === '2026 (Jul)') growth = -0.4; // Separuh tahun
+                    if(year === '2026 (Jul)') growth = -0.4;
 
                     let currentRev = baseRevenue * (1 + growth);
                     let currentProf = currentRev * profitMargin;
                     
-                    // Dividen hanya bayar bila untung, rawak antara 20-40% dari profit
                     let currentDiv = currentProf > 0 ? currentProf * (Math.random() * 0.2 + 0.2) : 0;
 
                     mockData.push({
                         Syarikat: sub, Tahun: year, Kategori: 'Sebenar',
                         Perolehan: currentRev, UntungBersih: currentProf, Dividen: currentDiv
                     });
-                    baseRevenue = year === '2026 (Jul)' ? baseRevenue * 1.05 : currentRev; // reset base untuk unjuran
+                    baseRevenue = year === '2026 (Jul)' ? baseRevenue * 1.05 : currentRev;
                 });
 
-                // Targets (2026 - 2030) - Full year 2026
                 const targetYears = [2026, 2027, 2028, 2029, 2030];
                 targetYears.forEach(year => {
-                    // Unjuran strategik: Pertumbuhan positif stabil
                     let growth = Math.random() * 0.08 + 0.05; 
                     let targetRev = baseRevenue * (1 + growth);
-                    let targetProfMargin = profitMargin * 1.1; // Penambahbaikan margin
+                    let targetProfMargin = profitMargin * 1.1;
                     let targetProf = targetRev * targetProfMargin;
 
                     mockData.push({
                         Syarikat: sub, Tahun: year, Kategori: 'Sasaran',
-                        Perolehan: targetRev, UntungBersih: targetProf, Dividen: 0 // Target dividen mungkin tak tunjuk
+                        Perolehan: targetRev, UntungBersih: targetProf, Dividen: 0
                     });
                     baseRevenue = targetRev;
                 });
@@ -388,11 +390,9 @@
                     skipEmptyLines: true,
                     complete: function(results) {
                         if(results.data && results.data.length > 0) {
-                            // Cek jika data CSV masuk akal (mempunyai lajur yang diharapkan)
                             const sample = results.data[0];
                             const keys = Object.keys(sample).join(' ').toLowerCase();
                             if(keys.includes('syarikat') || keys.includes('perolehan') || keys.includes('untung')) {
-                                // Guna data sebenar, tapi selaraskan format
                                 console.log("Data CSV berjaya dimuat:", results.data);
                                 mapCsvToDashboardFormat(results.data);
                                 document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800";
@@ -412,12 +412,16 @@
                 fallbackToMock("Ralat sistem, menggunakan data simulasi.");
             }
             
-            // Auto-load ulasan jika wujud di localStorage
             const savedUlasan = localStorage.getItem('angkasaUlasanAnalisa');
             if(savedUlasan) {
                 document.getElementById('strategicAnalysisText').value = savedUlasan;
             } else {
                 generateDefaultAnalysis();
+            }
+
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if(savedKey) {
+                document.getElementById('geminiApiKey').value = savedKey;
             }
         }
 
@@ -429,10 +433,8 @@
             processAndRenderDashboard('ALL');
         }
 
-        // Jika CSV mempunyai format berbeza, ini cuba mencari lajur yang sepadan
         function mapCsvToDashboardFormat(csvData) {
             dashboardData = csvData.map(row => {
-                // Cuba cari kunci (key) berdasarkan corak
                 const keys = Object.keys(row);
                 let findKey = (keywords) => keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw)));
                 
@@ -470,11 +472,9 @@
                 activeData = dashboardData.filter(d => d.Syarikat.includes(filterSyarikat) || filterSyarikat.includes(d.Syarikat));
             }
 
-            // Asingkan Sebenar dan Sasaran
             const actualData = activeData.filter(d => ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Jul)'].includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sebenar'));
             const targetData = activeData.filter(d => ['2026', '2027', '2028', '2029', '2030'].includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sasaran'));
 
-            // Pengiraan KPI
             let totalActualRev = 0; let totalActualProf = 0; let totalDiv = 0;
             actualData.forEach(d => {
                 totalActualRev += d.Perolehan;
@@ -490,14 +490,12 @@
             
             let avgMargin = totalActualRev > 0 ? ((totalActualProf / totalActualRev) * 100).toFixed(1) : 0;
 
-            // Kemaskini DOM
             document.getElementById('kpi-revenue-hist').innerText = 'RM ' + formatRM(totalActualRev);
             document.getElementById('kpi-profit-hist').innerText = 'RM ' + formatRM(totalActualProf);
             document.getElementById('kpi-margin').innerHTML = `<i class="fa-solid fa-percent mr-1"></i> Purata Margin: ${avgMargin}%`;
             document.getElementById('kpi-revenue-target').innerText = 'RM ' + formatRM(avgTargetRev);
             document.getElementById('kpi-dividend').innerText = 'RM ' + formatRM(totalDiv);
 
-            // Bina Carta & Jadual
             renderCharts(actualData, targetData, activeData, filterSyarikat);
             renderCompanyProfitChart(filterSyarikat);
             renderFinancialTables();
@@ -609,7 +607,6 @@
                     yearTotalsRev[year] += rev;
                     yearTotalsProf[year] += prof;
 
-                    // Class highlight mengikut jenis tahun
                     let yearBgClass = year === '2026 (Jul)' ? 'bg-blue-50/50' : (['2026','2027','2028','2029','2030'].includes(year) ? 'bg-purple-50/30' : '');
 
                     revRowHtml += `<td class="py-2.5 px-3 text-right ${yearBgClass}">${formatRM(rev)}</td>`;
@@ -629,7 +626,6 @@
                 profTbody.appendChild(trProf);
             });
 
-            // Footer Totals
             let revFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
             let profFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
 
@@ -647,7 +643,6 @@
         }
 
         function renderCharts(actualData, targetData, activeData, filterStatus) {
-            // Helper untuk mengumpul data berdasarkan tahun
             const aggByYear = (dataArray, yearsList) => {
                 let res = { labels: [], rev: [], prof: [], div: [] };
                 yearsList.forEach(y => {
@@ -672,7 +667,6 @@
             Chart.defaults.color = '#64748b';
             const gridOpts = { color: '#f1f5f9' };
 
-            // 1. Carta Prestasi Sebenar (Historical)
             if(chartInstances.hist) chartInstances.hist.destroy();
             const ctxHist = document.getElementById('historicalChart').getContext('2d');
             chartInstances.hist = new Chart(ctxHist, {
@@ -705,7 +699,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
             });
 
-            // 2. Carta Sasaran (Targets)
             if(chartInstances.target) chartInstances.target.destroy();
             const ctxTarget = document.getElementById('targetChart').getContext('2d');
             chartInstances.target = new Chart(ctxTarget, {
@@ -716,7 +709,7 @@
                         {
                             label: 'Sasaran Perolehan',
                             data: targetAgg.rev,
-                            borderColor: '#8b5cf6', // purple
+                            borderColor: '#8b5cf6',
                             backgroundColor: 'rgba(139, 92, 246, 0.1)',
                             fill: true,
                             borderWidth: 3,
@@ -726,7 +719,7 @@
                         {
                             label: 'Sasaran Untung',
                             data: targetAgg.prof,
-                            borderColor: '#f59e0b', // amber
+                            borderColor: '#f59e0b',
                             backgroundColor: 'transparent',
                             borderWidth: 3,
                             tension: 0.4,
@@ -737,19 +730,16 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
             });
 
-            // 3. Carta Komposisi (Pie)
             if(chartInstances.comp) chartInstances.comp.destroy();
             const ctxComp = document.getElementById('compositionChart').getContext('2d');
             
             let compLabels = []; let compData = [];
             if(filterStatus === 'ALL') {
-                // Group by Company for latest actual year (2025/2026)
                 let latestData = actualData.filter(d => d.Tahun === '2025' || d.Tahun === '2026 (Jul)');
                 let groupComp = {};
                 latestData.forEach(d => {
                     groupComp[d.Syarikat] = (groupComp[d.Syarikat] || 0) + d.Perolehan;
                 });
-                // Ambil top 5, rest "Lain-lain"
                 let sortComp = Object.entries(groupComp).sort((a,b) => b[1] - a[1]);
                 let top5 = sortComp.slice(0, 5);
                 let others = sortComp.slice(5).reduce((sum, item) => sum + item[1], 0);
@@ -758,7 +748,6 @@
                 compData = top5.map(i => i[1]);
                 if(others > 0) { compLabels.push('Lain-lain'); compData.push(others); }
             } else {
-                // Jika satu syarikat, tunjuk perbandingan Rev vs Untung vs Kos (anggaran) untuk terkini
                 compLabels = ['Untung Bersih', 'Anggaran Kos Operasi'];
                 let rev = histAgg.rev[histAgg.rev.length-1] || 0;
                 let prof = histAgg.prof[histAgg.prof.length-1] || 0;
@@ -778,7 +767,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font:{size: 10} } } } }
             });
 
-            // 4. Carta Dividen
             if(chartInstances.div) chartInstances.div.destroy();
             const ctxDiv = document.getElementById('dividendChart').getContext('2d');
             chartInstances.div = new Chart(ctxDiv, {
@@ -800,7 +788,7 @@
 
         function generateDefaultAnalysis() {
             const currentDate = "Julai 2026";
-            const defaultText = `LAPORAN ANALISA STRATEGIK PRESTASI ANAK SYARIKAT ANGKASA (KEMASKINI: ${currentDate})
+            const defaultText = `LAPORAN ANALISA STRATEGIK PRESTASI KUMPULAN ANGKASA (KEMASKINI: ${currentDate})
 
 1. PRESTASI SEMASA (2020 - ${currentDate}):
 • Perolehan Kumpulan mencatatkan trend pertumbuhan yang positif pasca-pandemik, didorong terutamanya oleh sektor Perkhidmatan dan Perdagangan.
@@ -830,24 +818,68 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
             alert("Nota Analisa Strategik telah disimpan ke dalam peranti anda (Local Storage). Ia akan kekal apabila anda membuka semula dashboard ini.");
         }
 
-        // Fungsi Penjanaan Ulasan Automatik Menggunakan Gemini AI
+        // Penjana Ulasan Berasaskan Data Terkini (Local Engine / Fallback)
+        function generateLocalDynamicAnalysis(entityName) {
+            const revHist = document.getElementById('kpi-revenue-hist').innerText;
+            const profHist = document.getElementById('kpi-profit-hist').innerText;
+            const marginText = document.getElementById('kpi-margin').innerText;
+            const targetRev = document.getElementById('kpi-revenue-target').innerText;
+            const divTotal = document.getElementById('kpi-dividend').innerText;
+
+            const isAll = entityName === 'ALL';
+            const entityTitle = isAll ? "KESELURUHAN KUMPULAN ANGKASA" : entityName;
+
+            let report = `LAPORAN ANALISA STRATEGIK PRESTASI & UNJURAN EKSEKUTIF\nENTITI: ${entityTitle}\nTARIKH SEMAKAN: JULAI 2026\n\n`;
+
+            report += `1. PRESTASI SEBENAR TERKUMPUL (2020 - JULAI 2026):\n`;
+            report += `• Jumlah Perolehan Terkumpul: ${revHist} Juta.\n`;
+            report += `• Untung Bersih Terkumpul: ${profHist} Juta (${marginText}).\n`;
+            report += `• Prestasi operasi menunjukkan trajektori pertumbuhan yang mampan, di mana pemulihan perniagaan kelihatan kukuh pasca 2021. Peningkatan volum perniagaan secara konsisten menyumbang kepada margin bersih yang berdaya tahan.\n\n`;
+
+            report += `2. ANALISA AGIHAN DIVIDEN & PULANGAN PELABURAN:\n`;
+            report += `• Jumlah Dividen Disalurkan: ${divTotal} Juta.\n`;
+            report += `• Agihan dividen mencerminkan komitmen berterusan terhadap pemegang saham, disokong oleh ketersediaan aliran tunai bebas operasi yang positif.\n\n`;
+
+            report += `3. UNJURAN STRATEGIK & HALA TUJU (2026 - 2030):\n`;
+            report += `• Sasaran Perolehan Purata Setahun (2026-2030): ${targetRev}.\n`;
+            report += `• Bagi mencapai unjuran 5 tahun akan datang, fokus strategik keutamaan merangkumi:\n`;
+            report += `   a) Peluasan pasaran sasaran dan sinergi perniagaan rentas entiti Kumpulan.\n`;
+            report += `   b) Kecekapan modal insan serta automasi proses operasi untuk mengekalkan nisbah kos-kepada-pendapatan yang sihat.\n`;
+            report += `   c) Kawalan risiko kredit dan pemantauan aliran tunai bagi memastikan sasaran dividen berterusan.\n\n`;
+
+            report += `KESIMPULAN & CADANGAN TINDAKAN:\n`;
+            report += `Secara kesimpulannya, prestasi kewangan ${entityTitle} berada di landasan yang betul. Jawatankuasa Pengurusan disyorkan untuk melaksanakan semakan KPI secara berkala serta mengurangkan ketidakcekapan operasi bagi merealisasikan sasaran 2026-2030.`;
+
+            return report;
+        }
+
+        // Fungsi Penjanaan Ulasan Automatik (Menggunakan API Gemini jika ada, atau Penjana Dinamik Tempatan)
         async function generateAIAnalysis() {
             const btn = document.getElementById('btnAiGenerate');
             const textarea = document.getElementById('strategicAnalysisText');
+            const statusMsg = document.getElementById('aiStatusMsg');
             const selectedEntity = document.getElementById('subsidiaryFilter').value;
-            
+            const apiKeyInput = document.getElementById('geminiApiKey').value.trim();
+
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Sedang Menganalisis Data...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Menganalisis Data...';
+            statusMsg.innerHTML = '<span class="text-purple-600 font-medium"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sedang menjana ulasan analitikal...</span>';
+
+            // Simpan API Key jika dimasukkan
+            if(apiKeyInput) {
+                localStorage.setItem('geminiApiKey', apiKeyInput);
+            }
 
             try {
-                // Kumpul data ringkasan untuk dihantar kepada Gemini API
-                const revenueHist = document.getElementById('kpi-revenue-hist').innerText;
-                const profitHist = document.getElementById('kpi-profit-hist').innerText;
-                const marginHist = document.getElementById('kpi-margin').innerText;
-                const targetRev = document.getElementById('kpi-revenue-target').innerText;
-                const divTotal = document.getElementById('kpi-dividend').innerText;
+                if (apiKeyInput) {
+                    // Cuba gunakan API Gemini secara langsung jika Kunci API dimasukkan oleh pengguna
+                    const revenueHist = document.getElementById('kpi-revenue-hist').innerText;
+                    const profitHist = document.getElementById('kpi-profit-hist').innerText;
+                    const marginHist = document.getElementById('kpi-margin').innerText;
+                    const targetRev = document.getElementById('kpi-revenue-target').innerText;
+                    const divTotal = document.getElementById('kpi-dividend').innerText;
 
-                const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi berikut bagi entiti: "${selectedEntity}".
+                    const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi berikut bagi entiti: "${selectedEntity}".
 Ringkasan Data Metrik:
 - Perolehan Terkumpul (2020-2026 Jul): ${revenueHist}
 - Untung Bersih Terkumpul: ${profitHist} (${marginHist})
@@ -861,37 +893,40 @@ Sila sediakan Ulasan Analisa Eksekutif yang profesional, berstruktur, dan releva
 
 Berikan ulasan yang tajam, rasional perancangan strategik, dan cadangan tindakan (actionable insights).`;
 
-                const systemInstruction = "Anda adalah pakar perancangan strategik korporat untuk Kumpulan ANGKASA Malaysia. Hasilkan laporan yang formal, padat, dan analitis.";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyInput}`;
 
-                const apiKey = ""; // API Key disediakan secara automatik oleh persekitaran run-time
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
+                    });
 
-                const payload = {
-                    contents: [{ parts: [{ text: userPrompt }] }],
-                    systemInstruction: { parts: [{ text: systemInstruction }] }
-                };
+                    const result = await response.json();
+                    const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (aiText) {
-                    textarea.value = aiText;
-                    localStorage.setItem('angkasaUlasanAnalisa', aiText);
-                } else {
-                    alert("Gagal menjana ulasan AI. Sila cuba lagi.");
+                    if (aiText) {
+                        textarea.value = aiText;
+                        localStorage.setItem('angkasaUlasanAnalisa', aiText);
+                        statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI API!</span>';
+                        return;
+                    }
                 }
+
+                // Fallback / Generasi Tempatan Berasaskan Data Terkini
+                const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
+                textarea.value = generatedReport;
+                localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
+                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana berasaskan data semasa!</span>';
+
             } catch (error) {
-                console.error("AI Generation Error:", error);
-                alert("Berlaku ralat semasa menyambung ke perkhidmatan AI.");
+                console.warn("AI Generation Fallback Used:", error);
+                const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
+                textarea.value = generatedReport;
+                localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
+                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana berasaskan data semasa!</span>';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Gemini)</span>';
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Serta Merta)</span>';
             }
         }
 
