@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Prestasi Anak Syarikat ANGKASA</title>
+    <title>Dashboard Prestasi Kumpulan ANGKASA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -86,7 +86,7 @@
 
             <div class="p-6 space-y-4">
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Masukkan Kunci API Google Gemini anda untuk membolehkan penjelanaan ulasan analitikal eksekutif secara automatik menggunakan model AI berasaskan data semasa.
+                    Masukkan Kunci API Google Gemini anda untuk membolehkan penjanaan ulasan analitikal eksekutif secara automatik menggunakan model AI.
                 </p>
 
                 <div class="space-y-1.5">
@@ -98,7 +98,7 @@
                         </button>
                     </div>
                     <p class="text-[11px] text-slate-500 flex items-center justify-between mt-1">
-                        <span><i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Disimpan secara selamat dalam Local Storage peranti.</span>
+                        <span><i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Disimpan secara selamat dalam storan peranti.</span>
                     </p>
                 </div>
 
@@ -130,10 +130,10 @@
                 </select>
             </div>
             <div class="text-sm font-medium flex items-center space-x-2 text-slate-500">
-                <span id="dataStatusBadge" class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat Data CSV...
+                <span id="dataStatusBadge" class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Menyemak Data Sumber...
                 </span>
-                <span class="text-xs">Data Sumber Automatik</span>
+                <span class="text-xs" id="dataSourceInfo">Google Sheets / Auto-Sync</span>
             </div>
         </div>
 
@@ -161,7 +161,7 @@
             </div>
 
             <div class="glass-card rounded-xl p-5 border-t-4 border-t-purple-500">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Sasaran Perolehan (5 Tahun)</h3>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1" id="kpi-target-title">Sasaran Perolehan (5 Tahun)</h3>
                 <div class="flex items-baseline space-x-2">
                     <span class="text-2xl font-black text-slate-800" id="kpi-revenue-target">RM 0.00</span>
                     <span class="text-xs text-slate-500">Juta / Purata Setahun</span>
@@ -186,7 +186,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="glass-card rounded-xl p-5 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-slate-800" id="histChartTitle">Prestasi Sebenar (2020 - Semasa)</h2>
+                    <h2 class="text-lg font-bold text-slate-800" id="histChartTitle">Prestasi Sebenar</h2>
                     <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-semibold">Juta (RM)</span>
                 </div>
                 <div class="relative h-72 w-full flex-grow">
@@ -247,9 +247,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left text-slate-600 border-collapse">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="revenueTableHead">
-                            <!-- Populated dynamically -->
-                        </thead>
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="revenueTableHead"></thead>
                         <tbody id="revenueTableBody" class="divide-y divide-slate-200"></tbody>
                         <tfoot id="revenueTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300"></tfoot>
                     </table>
@@ -265,9 +263,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left text-slate-600 border-collapse">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="profitTableHead">
-                            <!-- Populated dynamically -->
-                        </thead>
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="profitTableHead"></thead>
                         <tbody id="profitTableBody" class="divide-y divide-slate-200"></tbody>
                         <tfoot id="profitTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300"></tfoot>
                     </table>
@@ -315,43 +311,41 @@
     </footer>
 
     <script>
-        // Pengesanan Automatik Tarikh Semasa (Bulan & Tahun Sistem)
         const now = new Date();
-        const currentYearNum = now.getFullYear(); // Contoh: 2026
+        const currentYearNum = now.getFullYear(); 
         const monthNames = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
-        const currentMonthName = monthNames[now.getMonth()]; // Mengikut bulan peranti semasa (cth: Okt)
+        const currentMonthName = monthNames[now.getMonth()]; 
         
-        // Label dinamik untuk bulan semasa (cth: "2026 (Okt)")
         const currentPeriodLabel = `${currentYearNum} (${currentMonthName})`;
 
-        // Senarai tahun bersejarah dinamik (bermula 2020 sehingga tahun semasa dengan bulan terkini)
-        let historicalYearsList = ['2020', '2021', '2022', '2023', '2024', '2025'];
-        if(currentYearNum > 2025) {
-            historicalYearsList.push(currentPeriodLabel);
-        } else {
-            // Jika tahun sistem sebelum 2026, guna format semasa
-            historicalYearsList.push(currentPeriodLabel);
-        }
+        let historicalYearsList = ['2020', '2021', '2022', '2023', '2024', '2025', currentPeriodLabel];
 
-        // Senarai tahun sasaran strategik (5 tahun selepas tahun semasa)
         let targetYearsList = [];
         for(let i = 1; i <= 5; i++) {
             targetYearsList.push((currentYearNum + i).toString());
         }
 
-        // Gabungan semua tahun untuk jadual dan carta perbandingan
         const allYearsList = [...historicalYearsList, ...targetYearsList];
 
-        // Kemaskini teks label pada UI secara automatik
-        document.getElementById('kpi-rev-title').innerText = `Perolehan Terkumpul (2020-${currentPeriodLabel})`;
-        document.getElementById('kpi-prof-title').innerText = `Untung Bersih Terkumpul (2020-${currentPeriodLabel})`;
-        document.getElementById('histChartTitle').innerText = `Prestasi Sebenar (2020 - ${currentPeriodLabel})`;
-        document.getElementById('targetChartTitle').innerText = `Unjuran Strategik (${targetYearsList[0]} - ${targetYearsList[targetYearsList.length-1]})`;
-        document.getElementById('revTableBadgeRange').innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
-        document.getElementById('profTableBadgeRange').innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
-        document.getElementById('footerYearText').innerHTML = `Disediakan untuk Kegunaan Perancangan Strategik &middot; Kumpulan ANGKASA &copy; ${currentYearNum}`;
+        document.addEventListener("DOMContentLoaded", () => {
+            const revTitleEl = document.getElementById('kpi-rev-title');
+            if(revTitleEl) revTitleEl.innerText = `Perolehan Terkumpul (2020-${currentPeriodLabel})`;
+            const profTitleEl = document.getElementById('kpi-prof-title');
+            if(profTitleEl) profTitleEl.innerText = `Untung Bersih Terkumpul (2020-${currentPeriodLabel})`;
+            const targetTitleEl = document.getElementById('kpi-target-title');
+            if(targetTitleEl) targetTitleEl.innerText = `Sasaran Perolehan (${targetYearsList[0]}-${targetYearsList[targetYearsList.length-1]})`;
+            const histTitleEl = document.getElementById('histChartTitle');
+            if(histTitleEl) histTitleEl.innerText = `Prestasi Sebenar (2020 - ${currentPeriodLabel})`;
+            const targetChartTitleEl = document.getElementById('targetChartTitle');
+            if(targetChartTitleEl) targetChartTitleEl.innerText = `Unjuran Strategik (${targetYearsList[0]} - ${targetYearsList[targetYearsList.length-1]})`;
+            const revBadgeEl = document.getElementById('revTableBadgeRange');
+            if(revBadgeEl) revBadgeEl.innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
+            const profBadgeEl = document.getElementById('profTableBadgeRange');
+            if(profBadgeEl) profBadgeEl.innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
+            const footerEl = document.getElementById('footerYearText');
+            if(footerEl) footerEl.innerHTML = `Disediakan untuk Kegunaan Perancangan Strategik &middot; Kumpulan ANGKASA &copy; ${currentYearNum}`;
+        });
 
-        // Senarai anak syarikat
         const subsidiariesList = [
             "MYANGKASA HOLDINGS SDN BHD",
             "MYANGKASA AMANAH BHD",
@@ -369,17 +363,18 @@
 
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFYnEntAPTCpi-Sw9Hh2N6Hnverlu74OaJ25o8dcIM4wqPEG1H0Am3XR_F3YgBIA/pub?output=csv";
 
-        let rawData = [];
         let dashboardData = []; 
         let chartInstances = {};
 
         const filterSelect = document.getElementById('subsidiaryFilter');
-        subsidiariesList.forEach(sub => {
-            const option = document.createElement('option');
-            option.value = sub;
-            option.textContent = sub;
-            filterSelect.appendChild(option);
-        });
+        if(filterSelect) {
+            subsidiariesList.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.textContent = sub;
+                filterSelect.appendChild(option);
+            });
+        }
 
         function openApiKeyModal() {
             const modal = document.getElementById('apiKeyModal');
@@ -388,49 +383,56 @@
             const alertBox = document.getElementById('modalStatusAlert');
 
             const savedKey = localStorage.getItem('geminiApiKey') || '';
-            input.value = savedKey;
+            if(input) input.value = savedKey;
 
-            if(savedKey) {
+            if(savedKey && alertBox) {
                 alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
                 alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API sedia disimpan dan aktif.</span>';
                 alertBox.classList.remove('hidden');
-            } else {
+            } else if(alertBox) {
                 alertBox.classList.add('hidden');
             }
 
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalBox.classList.remove('scale-95');
-                modalBox.classList.add('scale-100');
-            }, 10);
+            if(modal && modalBox) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalBox.classList.remove('scale-95');
+                    modalBox.classList.add('scale-100');
+                }, 10);
+            }
         }
 
         function closeApiKeyModal() {
             const modal = document.getElementById('apiKeyModal');
             const modalBox = document.getElementById('apiKeyModalBox');
-            modalBox.classList.remove('scale-100');
-            modalBox.classList.add('scale-95');
-            modal.classList.add('opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+            if(modal && modalBox) {
+                modalBox.classList.remove('scale-100');
+                modalBox.classList.add('scale-95');
+                modal.classList.add('opacity-0');
+                setTimeout(() => { modal.classList.add('hidden'); }, 200);
+            }
         }
 
         function toggleApiKeyVisibility() {
             const input = document.getElementById('modalGeminiApiKey');
             const icon = document.getElementById('eyeIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-solid fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fa-solid fa-eye';
+            if (input && icon) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fa-solid fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fa-solid fa-eye';
+                }
             }
         }
 
         function saveApiKeyFromModal() {
-            const input = document.getElementById('modalGeminiApiKey').value.trim();
+            const inputEl = document.getElementById('modalGeminiApiKey');
             const alertBox = document.getElementById('modalStatusAlert');
-            if(!input) {
+            const input = inputEl ? inputEl.value.trim() : '';
+            if(!input && alertBox) {
                 alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-amber-50 text-amber-800 border border-amber-200";
                 alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span>Sila masukkan Kunci API sebelum menyimpan.</span>';
                 alertBox.classList.remove('hidden');
@@ -438,19 +440,24 @@
             }
             localStorage.setItem('geminiApiKey', input);
             updateApiKeyUIIndicators();
-            alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
-            alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API Gemini berjaya disimpan!</span>';
-            alertBox.classList.remove('hidden');
+            if(alertBox) {
+                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API Gemini berjaya disimpan!</span>';
+                alertBox.classList.remove('hidden');
+            }
             setTimeout(() => { closeApiKeyModal(); }, 1000);
         }
 
         function clearApiKey() {
             localStorage.removeItem('geminiApiKey');
-            document.getElementById('modalGeminiApiKey').value = '';
+            const inputEl = document.getElementById('modalGeminiApiKey');
+            if(inputEl) inputEl.value = '';
             const alertBox = document.getElementById('modalStatusAlert');
-            alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200";
-            alertBox.innerHTML = '<i class="fa-solid fa-circle-info text-rose-600"></i> <span>Kunci API telah dipadamkan.</span>';
-            alertBox.classList.remove('hidden');
+            if(alertBox) {
+                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200";
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-info text-rose-600"></i> <span>Kunci API telah dipadamkan.</span>';
+                alertBox.classList.remove('hidden');
+            }
             updateApiKeyUIIndicators();
         }
 
@@ -459,15 +466,14 @@
             const indicator = document.getElementById('headerApiKeyIndicator');
             const statusText = document.getElementById('apiKeyStatusText');
             if (savedKey && savedKey.length > 5) {
-                if(indicator) { indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 border border-brand-900 shadow-sm"; }
+                if(indicator) indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 border border-brand-900 shadow-sm";
                 if(statusText) statusText.innerText = "API Gemini: Aktif";
             } else {
-                if(indicator) { indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900"; }
+                if(indicator) indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900";
                 if(statusText) statusText.innerText = "Set Kunci API";
             }
         }
 
-        // Penjanaan data simulasi strategik adaptif mengikut tahun semasa
         function generateMockData() {
             let mockData = [];
             subsidiariesList.forEach(sub => {
@@ -514,23 +520,27 @@
                     complete: function(results) {
                         if(results.data && results.data.length > 0) {
                             mapCsvToDashboardFormat(results.data);
-                            document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800";
-                            document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-check-circle"></i> Data Google Sheets Dimuatkan';
+                            const badge = document.getElementById('dataStatusBadge');
+                            if(badge) {
+                                badge.className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800";
+                                badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> Data Google Sheets Diselaraskan';
+                            }
                         } else {
-                            fallbackToMock("Format CSV kosong, menggunakan data simulasi.");
+                            fallbackToMock("Data CSV kosong, menggunakan simulasi pintar.");
                         }
                     },
                     error: function() {
-                        fallbackToMock("Gagal akses CSV, menggunakan data simulasi automatik.");
+                        fallbackToMock("Akses rangkaian disekat, menggunakan mod simulasi luar talian.");
                     }
                 });
             } catch (err) {
-                fallbackToMock("Ralat sistem, menggunakan data simulasi.");
+                fallbackToMock("Ralat akses, menggunakan data simulasi.");
             }
             
             const savedUlasan = localStorage.getItem('angkasaUlasanAnalisa');
-            if(savedUlasan) {
-                document.getElementById('strategicAnalysisText').value = savedUlasan;
+            const analysisEl = document.getElementById('strategicAnalysisText');
+            if(savedUlasan && analysisEl) {
+                analysisEl.value = savedUlasan;
             } else {
                 generateDefaultAnalysis();
             }
@@ -539,43 +549,53 @@
         function fallbackToMock(message) {
             console.warn(message);
             dashboardData = generateMockData();
-            document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800";
-            document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-database"></i> Data Simulasi Dinamik (Aktif)';
+            const badge = document.getElementById('dataStatusBadge');
+            if(badge) {
+                badge.className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800";
+                badge.innerHTML = '<i class="fa-solid fa-database"></i> Data Simulasi Pintar (Aktif)';
+            }
             processAndRenderDashboard('ALL');
         }
 
         function mapCsvToDashboardFormat(csvData) {
             dashboardData = csvData.map(row => {
+                if(!row) return null;
                 const keys = Object.keys(row);
-                let findKey = (keywords) => keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw)));
+                let findKey = (keywords) => keys.find(k => keywords.some(kw => k && k.toLowerCase().includes(kw)));
                 
-                let syarikatKey = findKey(['syarikat', 'company', 'subsidiary']) || keys[0];
-                let tahunKey = findKey(['tahun', 'year']) || keys[1];
+                let syarikatKey = findKey(['syarikat', 'company', 'subsidiary', 'nama']) || keys[0];
+                let tahunKey = findKey(['tahun', 'year', 'tempoh', 'period']) || keys[1];
                 let kategoriKey = findKey(['kategori', 'jenis', 'type', 'status']) || keys[2];
                 let perolehanKey = findKey(['perolehan', 'revenue', 'jualan', 'sales']) || keys[3];
                 let untungKey = findKey(['untung', 'profit', 'pat', 'net']) || keys[4];
                 let dividenKey = findKey(['dividen', 'dividend']) || keys[5];
 
                 let rawTahun = row[tahunKey] ? row[tahunKey].toString() : '';
-                // Jika data CSV merujuk tahun semasa, tukar kepada label semasa dinamik
-                if(rawTahun.includes('2026') && rawTahun.includes('Jul')) {
+                if(rawTahun && (rawTahun.includes('2026') || rawTahun.includes(currentYearNum.toString())) && (rawTahun.includes('Jul') || rawTahun.includes('Julai') || rawTahun.includes('Okt') || rawTahun.includes('Jun'))) {
                     rawTahun = currentPeriodLabel;
                 }
 
                 return {
-                    Syarikat: row[syarikatKey],
+                    Syarikat: row[syarikatKey] ? row[syarikatKey].toString() : 'TIDAK DINYATAKAN',
                     Tahun: rawTahun,
                     Kategori: row[kategoriKey] ? row[kategoriKey].toString() : 'Sebenar',
                     Perolehan: parseFloat(row[perolehanKey]) || 0,
                     UntungBersih: parseFloat(row[untungKey]) || 0,
                     Dividen: parseFloat(row[dividenKey]) || 0
                 };
-            });
+            }).filter(item => item !== null && item.Syarikat && item.Syarikat !== 'TIDAK DINYATAKAN');
+
+            if(dashboardData.length === 0) {
+                fallbackToMock("Format CSV tidak serasi, menggunakan simulasi.");
+                return;
+            }
+
             processAndRenderDashboard('ALL');
         }
 
         function filterData() {
-            const selected = document.getElementById('subsidiaryFilter').value;
+            const filterEl = document.getElementById('subsidiaryFilter');
+            const selected = filterEl ? filterEl.value : 'ALL';
             processAndRenderDashboard(selected);
         }
 
@@ -586,11 +606,11 @@
         function processAndRenderDashboard(filterSyarikat) {
             let activeData = dashboardData;
             if(filterSyarikat !== 'ALL') {
-                activeData = dashboardData.filter(d => d.Syarikat.includes(filterSyarikat) || filterSyarikat.includes(d.Syarikat));
+                activeData = dashboardData.filter(d => d.Syarikat && (d.Syarikat.includes(filterSyarikat) || filterSyarikat.includes(d.Syarikat)));
             }
 
-            const actualData = activeData.filter(d => historicalYearsList.includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sebenar'));
-            const targetData = activeData.filter(d => targetYearsList.includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sasaran'));
+            const actualData = activeData.filter(d => d.Tahun && (historicalYearsList.includes(d.Tahun.toString()) || (d.Kategori && d.Kategori.toLowerCase().includes('sebenar'))));
+            const targetData = activeData.filter(d => d.Tahun && (targetYearsList.includes(d.Tahun.toString()) || (d.Kategori && d.Kategori.toLowerCase().includes('sasaran'))));
 
             let totalActualRev = 0; let totalActualProf = 0; let totalDiv = 0;
             actualData.forEach(d => {
@@ -606,11 +626,16 @@
             let avgTargetRev = countTargetRev > 0 ? (totalTargetRev / countTargetRev) : 0;
             let avgMargin = totalActualRev > 0 ? ((totalActualProf / totalActualRev) * 100).toFixed(1) : 0;
 
-            document.getElementById('kpi-revenue-hist').innerText = 'RM ' + formatRM(totalActualRev);
-            document.getElementById('kpi-profit-hist').innerText = 'RM ' + formatRM(totalActualProf);
-            document.getElementById('kpi-margin').innerHTML = `<i class="fa-solid fa-percent mr-1"></i> Purata Margin: ${avgMargin}%`;
-            document.getElementById('kpi-revenue-target').innerText = 'RM ' + formatRM(avgTargetRev);
-            document.getElementById('kpi-dividend').innerText = 'RM ' + formatRM(totalDiv);
+            const revHistEl = document.getElementById('kpi-revenue-hist');
+            if(revHistEl) revHistEl.innerText = 'RM ' + formatRM(totalActualRev);
+            const profHistEl = document.getElementById('kpi-profit-hist');
+            if(profHistEl) profHistEl.innerText = 'RM ' + formatRM(totalActualProf);
+            const marginEl = document.getElementById('kpi-margin');
+            if(marginEl) marginEl.innerHTML = `<i class="fa-solid fa-percent mr-1"></i> Purata Margin: ${avgMargin}%`;
+            const revTargetEl = document.getElementById('kpi-revenue-target');
+            if(revTargetEl) revTargetEl.innerText = 'RM ' + formatRM(avgTargetRev);
+            const divEl = document.getElementById('kpi-dividend');
+            if(divEl) divEl.innerText = 'RM ' + formatRM(totalDiv);
 
             renderCharts(actualData, targetData, activeData, filterSyarikat);
             renderCompanyProfitChart(filterSyarikat);
@@ -620,7 +645,9 @@
         function renderCompanyProfitChart(filterSyarikat) {
             if(chartInstances.companyProfit) chartInstances.companyProfit.destroy();
 
-            const ctxCompany = document.getElementById('companyProfitChart').getContext('2d');
+            const canvasEl = document.getElementById('companyProfitChart');
+            if(!canvasEl) return;
+            const ctxCompany = canvasEl.getContext('2d');
             const colorPalette = [
                 '#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#6366f1',
                 '#14b8a6', '#f97316', '#84cc16', '#06b6d4', '#a855f7', '#64748b'
@@ -628,14 +655,14 @@
 
             let activeCompanies = subsidiariesList;
             if(filterSyarikat !== 'ALL') {
-                activeCompanies = subsidiariesList.filter(s => s.includes(filterSyarikat) || filterSyarikat.includes(s));
+                activeCompanies = subsidiariesList.filter(s => s && (s.includes(filterSyarikat) || filterSyarikat.includes(s)));
             }
 
             const datasets = activeCompanies.map((company, index) => {
                 const dataPoints = allYearsList.map(year => {
                     const row = dashboardData.find(d => 
-                        (d.Syarikat === company || d.Syarikat.includes(company)) && 
-                        d.Tahun.toString() === year.toString()
+                        d.Syarikat && (d.Syarikat === company || d.Syarikat.includes(company)) && 
+                        d.Tahun && d.Tahun.toString() === year.toString()
                     );
                     return row ? row.UntungBersih : 0;
                 });
@@ -687,7 +714,7 @@
             let headerHtml = `<tr><th scope="col" class="py-3 px-4 font-bold sticky left-0 bg-slate-100 z-10">Anak Syarikat</th>`;
             historicalYearsList.forEach((y, idx) => {
                 let isCurrent = (idx === historicalYearsList.length - 1);
-                let bgCls = isCurrent ? 'bg-blue-50 text-blue-900' : '';
+                let bgCls = isCurrent ? 'bg-blue-50 text-blue-900 font-bold' : '';
                 headerHtml += `<th scope="col" class="py-3 px-3 text-right ${bgCls}">${y}</th>`;
             });
             targetYearsList.forEach(y => {
@@ -695,16 +722,16 @@
             });
             headerHtml += `</tr>`;
 
-            revThead.innerHTML = headerHtml;
-            profThead.innerHTML = headerHtml;
+            if(revThead) revThead.innerHTML = headerHtml;
+            if(profThead) profThead.innerHTML = headerHtml;
 
             const revTbody = document.getElementById('revenueTableBody');
             const revTfoot = document.getElementById('revenueTableFoot');
             const profTbody = document.getElementById('profitTableBody');
             const profTfoot = document.getElementById('profitTableFoot');
 
-            revTbody.innerHTML = '';
-            profTbody.innerHTML = '';
+            if(revTbody) revTbody.innerHTML = '';
+            if(profTbody) profTbody.innerHTML = '';
 
             let yearTotalsRev = {};
             let yearTotalsProf = {};
@@ -716,8 +743,8 @@
 
                 allYearsList.forEach(year => {
                     const dataRow = dashboardData.find(d => 
-                        (d.Syarikat === company || d.Syarikat.includes(company)) && 
-                        d.Tahun.toString() === year.toString()
+                        d.Syarikat && (d.Syarikat === company || d.Syarikat.includes(company)) && 
+                        d.Tahun && d.Tahun.toString() === year.toString()
                     );
 
                     const rev = dataRow ? dataRow.Perolehan : 0;
@@ -728,31 +755,36 @@
 
                     let isCurrCol = (year === currentPeriodLabel);
                     let isTargetCol = targetYearsList.includes(year);
-                    let yearBgClass = isCurrCol ? 'bg-blue-50/50' : (isTargetCol ? 'bg-purple-50/30' : '');
+                    let yearBgClass = isCurrCol ? 'bg-blue-50/50 font-bold' : (isTargetCol ? 'bg-purple-50/30' : '');
 
                     revRowHtml += `<td class="py-2.5 px-3 text-right ${yearBgClass}">${formatRM(rev)}</td>`;
                     let profClass = prof < 0 ? 'text-rose-600 font-semibold' : (prof > 0 ? 'text-slate-700' : 'text-slate-400');
+                    if(isCurrCol) profClass += ' font-bold';
                     profRowHtml += `<td class="py-2.5 px-3 text-right ${yearBgClass} ${profClass}">${formatRM(prof)}</td>`;
                 });
 
-                const trRev = document.createElement('tr');
-                trRev.className = "hover:bg-slate-50 border-b border-slate-100";
-                trRev.innerHTML = revRowHtml;
-                revTbody.appendChild(trRev);
+                if(revTbody) {
+                    const trRev = document.createElement('tr');
+                    trRev.className = "hover:bg-slate-50 border-b border-slate-100";
+                    trRev.innerHTML = revRowHtml;
+                    revTbody.appendChild(trRev);
+                }
 
-                const trProf = document.createElement('tr');
-                trProf.className = "hover:bg-slate-50 border-b border-slate-100";
-                trProf.innerHTML = profRowHtml;
-                profTbody.appendChild(trProf);
+                if(profTbody) {
+                    const trProf = document.createElement('tr');
+                    trProf.className = "hover:bg-slate-50 border-b border-slate-100";
+                    trProf.innerHTML = profRowHtml;
+                    profTbody.appendChild(trProf);
+                }
             });
 
-            let revFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
-            let profFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
+            let revFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURUHAN (RM JUTA)</td>`;
+            let profFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURUHAN (RM JUTA)</td>`;
 
             allYearsList.forEach(year => {
                 let isCurrCol = (year === currentPeriodLabel);
                 let isTargetCol = targetYearsList.includes(year);
-                let yearBgClass = isCurrCol ? 'bg-blue-100/60' : (isTargetCol ? 'bg-purple-100/60' : '');
+                let yearBgClass = isCurrCol ? 'bg-blue-100/60 font-bold' : (isTargetCol ? 'bg-purple-100/60' : '');
                 
                 revFootHtml += `<td class="py-3 px-3 text-right ${yearBgClass}">${formatRM(yearTotalsRev[year])}</td>`;
                 let profVal = yearTotalsProf[year];
@@ -760,15 +792,15 @@
                 profFootHtml += `<td class="py-3 px-3 text-right ${yearBgClass} ${profClass}">${formatRM(profVal)}</td>`;
             });
 
-            revTfoot.innerHTML = `<tr>${revFootHtml}</tr>`;
-            profTfoot.innerHTML = `<tr>${profFootHtml}</tr>`;
+            if(revTfoot) revTfoot.innerHTML = `<tr>${revFootHtml}</tr>`;
+            if(profTfoot) profTfoot.innerHTML = `<tr>${profFootHtml}</tr>`;
         }
 
         function renderCharts(actualData, targetData, activeData, filterStatus) {
             const aggByYear = (dataArray, yearsList) => {
                 let res = { labels: [], rev: [], prof: [], div: [] };
                 yearsList.forEach(y => {
-                    let yearData = dataArray.filter(d => d.Tahun.toString() === y.toString());
+                    let yearData = dataArray.filter(d => d.Tahun && d.Tahun.toString() === y.toString());
                     if(yearData.length > 0) {
                         res.labels.push(y);
                         res.rev.push(yearData.reduce((sum, d) => sum + d.Perolehan, 0));
@@ -786,86 +818,94 @@
             Chart.defaults.color = '#64748b';
             const gridOpts = { color: '#f1f5f9' };
 
-            if(chartInstances.hist) chartInstances.hist.destroy();
-            const ctxHist = document.getElementById('historicalChart').getContext('2d');
-            chartInstances.hist = new Chart(ctxHist, {
-                type: 'bar',
-                data: {
-                    labels: histAgg.labels,
-                    datasets: [
-                        { label: 'Perolehan (RM Juta)', data: histAgg.rev, backgroundColor: '#0ea5e9', borderRadius: 4, order: 2 },
-                        { label: 'Untung Bersih (RM Juta)', data: histAgg.prof, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 4, order: 1 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
-            });
-
-            if(chartInstances.target) chartInstances.target.destroy();
-            const ctxTarget = document.getElementById('targetChart').getContext('2d');
-            chartInstances.target = new Chart(ctxTarget, {
-                type: 'line',
-                data: {
-                    labels: targetAgg.labels,
-                    datasets: [
-                        { label: 'Sasaran Perolehan', data: targetAgg.rev, borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, borderWidth: 3, tension: 0.4, borderDash: [5, 5] },
-                        { label: 'Sasaran Untung', data: targetAgg.prof, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 3, tension: 0.4, borderDash: [5, 5] }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
-            });
-
-            if(chartInstances.comp) chartInstances.comp.destroy();
-            const ctxComp = document.getElementById('compositionChart').getContext('2d');
-            
-            let compLabels = []; let compData = [];
-            if(filterStatus === 'ALL') {
-                let latestData = actualData.filter(d => d.Tahun === '2025' || d.Tahun === currentPeriodLabel);
-                let groupComp = {};
-                latestData.forEach(d => { groupComp[d.Syarikat] = (groupComp[d.Syarikat] || 0) + d.Perolehan; });
-                let sortComp = Object.entries(groupComp).sort((a,b) => b[1] - a[1]);
-                let top5 = sortComp.slice(0, 5);
-                let others = sortComp.slice(5).reduce((sum, item) => sum + item[1], 0);
-                
-                compLabels = top5.map(i => i[0].replace('MYANGKASA', 'MYA').replace(' SDN BHD',''));
-                compData = top5.map(i => i[1]);
-                if(others > 0) { compLabels.push('Lain-lain'); compData.push(others); }
-            } else {
-                compLabels = ['Untung Bersih', 'Anggaran Kos Operasi'];
-                let rev = histAgg.rev[histAgg.rev.length-1] || 0;
-                let prof = histAgg.prof[histAgg.prof.length-1] || 0;
-                compData = [prof, Math.max(0, rev - prof)];
+            const histCanvas = document.getElementById('historicalChart');
+            if(histCanvas) {
+                if(chartInstances.hist) chartInstances.hist.destroy();
+                chartInstances.hist = new Chart(histCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: histAgg.labels,
+                        datasets: [
+                            { label: 'Perolehan (RM Juta)', data: histAgg.rev, backgroundColor: '#0ea5e9', borderRadius: 4, order: 2 },
+                            { label: 'Untung Bersih (RM Juta)', data: histAgg.prof, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 4, order: 1 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
+                });
             }
 
-            chartInstances.comp = new Chart(ctxComp, {
-                type: 'doughnut',
-                data: {
-                    labels: compLabels,
-                    datasets: [{
-                        data: compData,
-                        backgroundColor: ['#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b'],
-                        borderWidth: 2, borderColor: '#ffffff'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font:{size: 10} } } } }
-            });
+            const targetCanvas = document.getElementById('targetChart');
+            if(targetCanvas) {
+                if(chartInstances.target) chartInstances.target.destroy();
+                chartInstances.target = new Chart(targetCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: targetAgg.labels,
+                        datasets: [
+                            { label: 'Sasaran Perolehan', data: targetAgg.rev, borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, borderWidth: 3, tension: 0.4, borderDash: [5, 5] },
+                            { label: 'Sasaran Untung', data: targetAgg.prof, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 3, tension: 0.4, borderDash: [5, 5] }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
+                });
+            }
 
-            if(chartInstances.div) chartInstances.div.destroy();
-            const ctxDiv = document.getElementById('dividendChart').getContext('2d');
-            chartInstances.div = new Chart(ctxDiv, {
-                type: 'bar',
-                data: {
-                    labels: histAgg.labels,
-                    datasets: [{
-                        label: 'Pembayaran Dividen (RM Juta)',
-                        data: histAgg.div,
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 4,
-                        barThickness: 'flex',
-                        maxBarThickness: 40
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return ' Dividen: RM ' + context.raw.toFixed(2) + ' Juta'; } } } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
-            });
+            const compCanvas = document.getElementById('compositionChart');
+            if(compCanvas) {
+                if(chartInstances.comp) chartInstances.comp.destroy();
+                let compLabels = []; let compData = [];
+                if(filterStatus === 'ALL') {
+                    let latestYear = historicalYearsList[historicalYearsList.length - 1];
+                    let latestData = actualData.filter(d => d.Tahun === latestYear || d.Tahun === currentPeriodLabel);
+                    let groupComp = {};
+                    latestData.forEach(d => { if(d.Syarikat) groupComp[d.Syarikat] = (groupComp[d.Syarikat] || 0) + d.Perolehan; });
+                    let sortComp = Object.entries(groupComp).sort((a,b) => b[1] - a[1]);
+                    let top5 = sortComp.slice(0, 5);
+                    let others = sortComp.slice(5).reduce((sum, item) => sum + item[1], 0);
+                    
+                    compLabels = top5.map(i => i[0].replace('MYANGKASA', 'MYA').replace(' SDN BHD',''));
+                    compData = top5.map(i => i[1]);
+                    if(others > 0) { compLabels.push('Lain-lain'); compData.push(others); }
+                } else {
+                    compLabels = ['Untung Bersih', 'Anggaran Kos Operasi'];
+                    let rev = histAgg.rev[histAgg.rev.length-1] || 0;
+                    let prof = histAgg.prof[histAgg.prof.length-1] || 0;
+                    compData = [prof, Math.max(0, rev - prof)];
+                }
+
+                chartInstances.comp = new Chart(compCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: compLabels,
+                        datasets: [{
+                            data: compData,
+                            backgroundColor: ['#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b'],
+                            borderWidth: 2, borderColor: '#ffffff'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font:{size: 10} } } } }
+                });
+            }
+
+            const divCanvas = document.getElementById('dividendChart');
+            if(divCanvas) {
+                if(chartInstances.div) chartInstances.div.destroy();
+                chartInstances.div = new Chart(divCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: histAgg.labels,
+                        datasets: [{
+                            label: 'Pembayaran Dividen (RM Juta)',
+                            data: histAgg.div,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4,
+                            barThickness: 'flex',
+                            maxBarThickness: 40
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return ' Dividen: RM ' + context.raw.toFixed(2) + ' Juta'; } } } }, scales: { y: { beginAtZero: true, grid: gridOpts }, x: { grid: {display: false} } } }
+                });
+            }
         }
 
         function generateDefaultAnalysis() {
@@ -886,25 +926,35 @@
 KESIMPULAN:
 Pengurusan Kumpulan ANGKASA disaran untuk terus memantau kecekapan kos dan meneroka peluang perniagaan baharu bagi memastikan sasaran strategik tercapai.`;
             
-            document.getElementById('strategicAnalysisText').value = defaultText;
+            const analysisEl = document.getElementById('strategicAnalysisText');
+            if(analysisEl) analysisEl.value = defaultText;
         }
 
         function saveAnalysis() {
-            const text = document.getElementById('strategicAnalysisText').value;
+            const analysisEl = document.getElementById('strategicAnalysisText');
+            const text = analysisEl ? analysisEl.value : '';
             localStorage.setItem('angkasaUlasanAnalisa', text);
             const statusMsg = document.getElementById('aiStatusMsg');
-            statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-floppy-disk mr-1"></i> Ulasan disimpan secara tempatan!</span>';
-            setTimeout(() => {
-                statusMsg.innerHTML = '<i class="fa-solid fa-info-circle mr-1 text-brand-700"></i> Jana ulasan automatik berasaskan metrik semasa.';
-            }, 3000);
+            if(statusMsg) {
+                statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-floppy-disk mr-1"></i> Ulasan disimpan secara tempatan!</span>';
+                setTimeout(() => {
+                    statusMsg.innerHTML = '<i class="fa-solid fa-info-circle mr-1 text-brand-700"></i> Jana ulasan automatik berasaskan metrik semasa.';
+                }, 3000);
+            }
         }
 
         function generateLocalDynamicAnalysis(entityName) {
-            const revHist = document.getElementById('kpi-revenue-hist').innerText;
-            const profHist = document.getElementById('kpi-profit-hist').innerText;
-            const marginText = document.getElementById('kpi-margin').innerText;
-            const targetRev = document.getElementById('kpi-revenue-target').innerText;
-            const divTotal = document.getElementById('kpi-dividend').innerText;
+            const revHistEl = document.getElementById('kpi-revenue-hist');
+            const profHistEl = document.getElementById('kpi-profit-hist');
+            const marginEl = document.getElementById('kpi-margin');
+            const targetRevEl = document.getElementById('kpi-revenue-target');
+            const divTotalEl = document.getElementById('kpi-dividend');
+
+            const revHist = revHistEl ? revHistEl.innerText : '0.00';
+            const profHist = profHistEl ? profHistEl.innerText : '0.00';
+            const marginText = marginEl ? marginEl.innerText : '0%';
+            const targetRev = targetRevEl ? targetRevEl.innerText : '0.00';
+            const divTotal = divTotalEl ? divTotalEl.innerText : '0.00';
 
             const isAll = entityName === 'ALL';
             const entityTitle = isAll ? "KESELURUHAN KUMPULAN ANGKASA" : entityName;
@@ -924,20 +974,23 @@ Pengurusan Kumpulan ANGKASA disaran untuk terus memantau kecekapan kos dan mener
             const btn = document.getElementById('btnAiGenerate');
             const textarea = document.getElementById('strategicAnalysisText');
             const statusMsg = document.getElementById('aiStatusMsg');
-            const selectedEntity = document.getElementById('subsidiaryFilter').value;
+            const filterEl = document.getElementById('subsidiaryFilter');
+            const selectedEntity = filterEl ? filterEl.value : 'ALL';
             const apiKeyInput = (localStorage.getItem('geminiApiKey') || '').trim();
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Menganalisis...';
-            statusMsg.innerHTML = '<span class="text-purple-600 font-medium"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sedang menjana ulasan analitikal...</span>';
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Menganalisis...';
+            }
+            if(statusMsg) statusMsg.innerHTML = '<span class="text-purple-600 font-medium"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sedang menjana ulasan analitikal...</span>';
 
             try {
                 if (apiKeyInput) {
-                    const revenueHist = document.getElementById('kpi-revenue-hist').innerText;
-                    const profitHist = document.getElementById('kpi-profit-hist').innerText;
-                    const marginHist = document.getElementById('kpi-margin').innerText;
-                    const targetRev = document.getElementById('kpi-revenue-target').innerText;
-                    const divTotal = document.getElementById('kpi-dividend').innerText;
+                    const revenueHist = document.getElementById('kpi-revenue-hist')?.innerText || '';
+                    const profitHist = document.getElementById('kpi-profit-hist')?.innerText || '';
+                    const marginHist = document.getElementById('kpi-margin')?.innerText || '';
+                    const targetRev = document.getElementById('kpi-revenue-target')?.innerText || '';
+                    const divTotal = document.getElementById('kpi-dividend')?.innerText || '';
 
                     const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi bagi entiti: "${selectedEntity}" sehingga ${currentPeriodLabel}.
 Ringkasan Data:
@@ -957,27 +1010,29 @@ Sediakan Ulasan Analisa Eksekutif profesional dalam Bahasa Melayu.`;
                     const result = await response.json();
                     const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                    if (aiText) {
+                    if (aiText && textarea) {
                         textarea.value = aiText;
                         localStorage.setItem('angkasaUlasanAnalisa', aiText);
-                        statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI API!</span>';
+                        if(statusMsg) statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI API!</span>';
                         return;
                     }
                 }
 
                 const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
-                textarea.value = generatedReport;
+                if(textarea) textarea.value = generatedReport;
                 localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
-                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana berasaskan tarikh semasa.</span>';
+                if(statusMsg) statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana.</span>';
 
             } catch (error) {
                 const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
-                textarea.value = generatedReport;
+                if(textarea) textarea.value = generatedReport;
                 localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
-                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana.</span>';
+                if(statusMsg) statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana.</span>';
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Serta Merta)</span>';
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Serta Merta)</span>';
+                }
             }
         }
 
