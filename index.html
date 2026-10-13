@@ -26,28 +26,20 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        
-        /* Skrol kustom */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
         @media print {
             body { background: white; }
             .no-print { display: none !important; }
             .glass-card { box-shadow: none; border: 1px solid #e2e8f0; break-inside: avoid; }
         }
-
-        /* Modal animation */
-        .modal-animate {
-            transition: all 0.25s ease-out;
-        }
+        .modal-animate { transition: all 0.25s ease-out; }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Navbar/Header -->
     <header class="bg-brand-900 text-white shadow-md sticky top-0 z-40 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -56,20 +48,17 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Kumpulan ANGKASA</h1>
-                    <p class="text-xs text-brand-100 font-medium">Dashboard Perancangan Strategik & Prestasi</p>
+                    <p class="text-xs text-brand-100 font-medium">Dashboard Perancangan Strategik & Prestasi Automatik</p>
                 </div>
             </div>
             
-            <!-- Header Action Buttons -->
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <!-- Butang Gambar Skru / Setting Icon untuk Gemini API Key -->
                 <button onclick="openApiKeyModal()" title="Tetapan Kunci API Gemini" class="bg-brand-800 hover:bg-brand-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2 border border-brand-700 shadow-sm relative group">
                     <i class="fa-solid fa-gear text-lg group-hover:rotate-45 transition-transform duration-300"></i>
                     <span class="hidden sm:inline">Tetapan API</span>
                     <span id="headerApiKeyIndicator" class="w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900" title="Status API"></span>
                 </button>
 
-                <!-- Butang Cetak / Eksport -->
                 <button onclick="window.print()" class="bg-brand-700 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
                     <i class="fa-solid fa-print"></i>
                     <span class="hidden xs:inline">Cetak / Eksport</span>
@@ -78,10 +67,8 @@
         </div>
     </header>
 
-    <!-- Modal Tetapan Kunci API Gemini -->
     <div id="apiKeyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden modal-animate opacity-0">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden transform scale-95 transition-all duration-200" id="apiKeyModalBox">
-            <!-- Modal Header -->
             <div class="bg-gradient-to-r from-brand-900 to-brand-800 px-6 py-4 text-white flex justify-between items-center">
                 <div class="flex items-center space-x-2.5">
                     <div class="bg-white/10 p-2 rounded-lg backdrop-blur-md">
@@ -97,7 +84,6 @@
                 </button>
             </div>
 
-            <!-- Modal Content -->
             <div class="p-6 space-y-4">
                 <p class="text-xs text-slate-600 leading-relaxed">
                     Masukkan Kunci API Google Gemini anda untuk membolehkan penjelanaan ulasan analitikal eksekutif secara automatik menggunakan model AI berasaskan data semasa.
@@ -112,22 +98,19 @@
                         </button>
                     </div>
                     <p class="text-[11px] text-slate-500 flex items-center justify-between mt-1">
-                        <span><i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Disimpan secara selamat dalam storan peranti (Local Storage).</span>
+                        <span><i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Disimpan secara selamat dalam Local Storage peranti.</span>
                     </p>
                 </div>
 
                 <div id="modalStatusAlert" class="hidden p-3 rounded-xl text-xs font-medium flex items-center space-x-2"></div>
             </div>
 
-            <!-- Modal Footer -->
             <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-between items-center gap-2">
                 <button type="button" onclick="clearApiKey()" class="px-3.5 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition border border-rose-200">
                     <i class="fa-solid fa-trash-can mr-1"></i> Padam Kunci
                 </button>
                 <div class="flex space-x-2">
-                    <button type="button" onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-lg transition">
-                        Batal
-                    </button>
+                    <button type="button" onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-lg transition">Batal</button>
                     <button type="button" onclick="saveApiKeyFromModal()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-700 hover:bg-brand-800 rounded-lg transition shadow-sm flex items-center space-x-1.5">
                         <i class="fa-solid fa-floppy-disk"></i>
                         <span>Simpan Kunci</span>
@@ -137,43 +120,37 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
         
-        <!-- Filter Bar -->
         <div class="glass-card rounded-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 no-print">
             <div class="flex items-center space-x-3 w-full md:w-auto">
                 <label for="subsidiaryFilter" class="font-semibold text-slate-700 text-sm">Pilih Entiti:</label>
                 <select id="subsidiaryFilter" onchange="filterData()" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full md:w-80 p-2.5">
                     <option value="ALL">Keseluruhan Kumpulan (Semua Anak Syarikat)</option>
-                    <!-- Options populated by JS -->
                 </select>
             </div>
             <div class="text-sm font-medium flex items-center space-x-2 text-slate-500">
                 <span id="dataStatusBadge" class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                     <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat Data CSV...
                 </span>
-                <span class="text-xs">Data Sumber: Google Sheets</span>
+                <span class="text-xs">Data Sumber Automatik</span>
             </div>
         </div>
 
-        <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- KPI 1 -->
             <div class="glass-card rounded-xl p-5 border-t-4 border-t-blue-500">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Perolehan Terkumpul (2020-2026 Jul)</h3>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1" id="kpi-rev-title">Perolehan Terkumpul</h3>
                 <div class="flex items-baseline space-x-2">
                     <span class="text-2xl font-black text-slate-800" id="kpi-revenue-hist">RM 0.00</span>
                     <span class="text-xs text-slate-500">Juta</span>
                 </div>
-                <div class="mt-2 text-xs font-medium text-emerald-600 flex items-center">
-                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> Pre-Audit 2026
+                <div class="mt-2 text-xs font-medium text-emerald-600 flex items-center" id="kpi-rev-sub">
+                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> Prestasi Semasa
                 </div>
             </div>
             
-            <!-- KPI 2 -->
             <div class="glass-card rounded-xl p-5 border-t-4 border-t-emerald-500">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Untung Bersih Terkumpul (2020-2026 Jul)</h3>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1" id="kpi-prof-title">Untung Bersih Terkumpul</h3>
                 <div class="flex items-baseline space-x-2">
                     <span class="text-2xl font-black text-slate-800" id="kpi-profit-hist">RM 0.00</span>
                     <span class="text-xs text-slate-500">Juta</span>
@@ -183,21 +160,19 @@
                 </div>
             </div>
 
-            <!-- KPI 3 -->
             <div class="glass-card rounded-xl p-5 border-t-4 border-t-purple-500">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Sasaran Perolehan (2026-2030)</h3>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Sasaran Perolehan (5 Tahun)</h3>
                 <div class="flex items-baseline space-x-2">
                     <span class="text-2xl font-black text-slate-800" id="kpi-revenue-target">RM 0.00</span>
                     <span class="text-xs text-slate-500">Juta / Purata Setahun</span>
                 </div>
                 <div class="mt-2 text-xs font-medium text-blue-600 flex items-center">
-                    <i class="fa-solid fa-bullseye mr-1"></i> Rancangan Strategik 5 Tahun
+                    <i class="fa-solid fa-bullseye mr-1"></i> Rancangan Strategik
                 </div>
             </div>
 
-            <!-- KPI 4 -->
             <div class="glass-card rounded-xl p-5 border-t-4 border-t-amber-500">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jumlah Dividen Dibayar (Sejak 2020)</h3>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jumlah Dividen Dibayar</h3>
                 <div class="flex items-baseline space-x-2">
                     <span class="text-2xl font-black text-slate-800" id="kpi-dividend">RM 0.00</span>
                     <span class="text-xs text-slate-500">Juta</span>
@@ -208,12 +183,10 @@
             </div>
         </div>
 
-        <!-- Charts Row 1: Historical & Targets -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Historical Chart -->
             <div class="glass-card rounded-xl p-5 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-slate-800">Prestasi Sebenar (2020 - Julai 2026)</h2>
+                    <h2 class="text-lg font-bold text-slate-800" id="histChartTitle">Prestasi Sebenar (2020 - Semasa)</h2>
                     <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-semibold">Juta (RM)</span>
                 </div>
                 <div class="relative h-72 w-full flex-grow">
@@ -221,10 +194,9 @@
                 </div>
             </div>
 
-            <!-- Target Chart -->
             <div class="glass-card rounded-xl p-5 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-slate-800">Unjuran Strategik (2026 - 2030)</h2>
+                    <h2 class="text-lg font-bold text-slate-800" id="targetChartTitle">Unjuran Strategik</h2>
                     <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded font-semibold">Juta (RM)</span>
                 </div>
                 <div class="relative h-72 w-full flex-grow">
@@ -233,9 +205,7 @@
             </div>
         </div>
 
-        <!-- Charts Row 2: Composition & Dividends -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Subsidiary Contribution -->
             <div class="glass-card rounded-xl p-5 lg:col-span-1 flex flex-col">
                 <h2 class="text-lg font-bold text-slate-800 mb-4">Komposisi Perolehan (Terkini)</h2>
                 <div class="relative h-64 w-full flex-grow flex items-center justify-center">
@@ -243,7 +213,6 @@
                 </div>
             </div>
 
-            <!-- Dividend Trend -->
             <div class="glass-card rounded-xl p-5 lg:col-span-2 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-slate-800">Trend Pembayaran Dividen & Polisi</h2>
@@ -255,11 +224,10 @@
             </div>
         </div>
 
-        <!-- Line Chart Row: Company Profit/Loss Comparison -->
         <div class="glass-card rounded-xl p-5">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">Trend Untung / Rugi Mengikut Anak Syarikat (2020 - 2030)</h2>
+                    <h2 class="text-lg font-bold text-slate-800">Trend Untung / Rugi Mengikut Anak Syarikat</h2>
                     <p class="text-xs text-slate-500">Perbandingan garisan untung/rugi bersih merentas tahun sebenar dan sasaran</p>
                 </div>
                 <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded font-semibold">Juta (RM)</span>
@@ -269,84 +237,44 @@
             </div>
         </div>
 
-        <!-- Tables Section: Revenue & Profit Breakdown -->
         <div class="space-y-6">
-            <!-- Table 1: Perolehan -->
             <div class="glass-card rounded-xl p-5 overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-slate-800 flex items-center">
                         <i class="fa-solid fa-table text-brand-700 mr-2"></i> 1. Jadual Perolehan Anak Syarikat (RM Juta)
                     </h2>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">2020 - 2030</span>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="revTableBadgeRange">2020 - 2030</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left text-slate-600 border-collapse">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200">
-                            <tr>
-                                <th scope="col" class="py-3 px-4 font-bold sticky left-0 bg-slate-100 z-10">Anak Syarikat</th>
-                                <th scope="col" class="py-3 px-3 text-right">2020</th>
-                                <th scope="col" class="py-3 px-3 text-right">2021</th>
-                                <th scope="col" class="py-3 px-3 text-right">2022</th>
-                                <th scope="col" class="py-3 px-3 text-right">2023</th>
-                                <th scope="col" class="py-3 px-3 text-right">2024</th>
-                                <th scope="col" class="py-3 px-3 text-right">2025</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-blue-50 text-blue-900">2026 (Jul)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900 border-l border-purple-200">2026 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2027 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2028 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2029 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2030 (S)</th>
-                            </tr>
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="revenueTableHead">
+                            <!-- Populated dynamically -->
                         </thead>
-                        <tbody id="revenueTableBody" class="divide-y divide-slate-200">
-                            <!-- Populated by JS -->
-                        </tbody>
-                        <tfoot id="revenueTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300">
-                            <!-- Populated by JS -->
-                        </tfoot>
+                        <tbody id="revenueTableBody" class="divide-y divide-slate-200"></tbody>
+                        <tfoot id="revenueTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300"></tfoot>
                     </table>
                 </div>
             </div>
 
-            <!-- Table 2: Untung / Rugi -->
             <div class="glass-card rounded-xl p-5 overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-slate-800 flex items-center">
                         <i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i> 2. Jadual Untung / Rugi Bersih Anak Syarikat (RM Juta)
                     </h2>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">2020 - 2030</span>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="profTableBadgeRange">2020 - 2030</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left text-slate-600 border-collapse">
-                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200">
-                            <tr>
-                                <th scope="col" class="py-3 px-4 font-bold sticky left-0 bg-slate-100 z-10">Anak Syarikat</th>
-                                <th scope="col" class="py-3 px-3 text-right">2020</th>
-                                <th scope="col" class="py-3 px-3 text-right">2021</th>
-                                <th scope="col" class="py-3 px-3 text-right">2022</th>
-                                <th scope="col" class="py-3 px-3 text-right">2023</th>
-                                <th scope="col" class="py-3 px-3 text-right">2024</th>
-                                <th scope="col" class="py-3 px-3 text-right">2025</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-blue-50 text-blue-900">2026 (Jul)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900 border-l border-purple-200">2026 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2027 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2028 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2029 (S)</th>
-                                <th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">2030 (S)</th>
-                            </tr>
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100/80 border-b border-slate-200" id="profitTableHead">
+                            <!-- Populated dynamically -->
                         </thead>
-                        <tbody id="profitTableBody" class="divide-y divide-slate-200">
-                            <!-- Populated by JS -->
-                        </tbody>
-                        <tfoot id="profitTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300">
-                            <!-- Populated by JS -->
-                        </tfoot>
+                        <tbody id="profitTableBody" class="divide-y divide-slate-200"></tbody>
+                        <tfoot id="profitTableFoot" class="bg-slate-100/90 font-bold text-slate-800 border-t-2 border-slate-300"></tfoot>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Strategic Analysis Section -->
         <div class="glass-card rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             <div class="bg-slate-800 px-5 py-3 border-b border-slate-700 flex justify-between items-center flex-wrap gap-2">
                 <h2 class="text-lg font-bold text-white flex items-center">
@@ -361,7 +289,7 @@
                 </div>
             </div>
             <div class="p-0">
-                <textarea id="strategicAnalysisText" class="w-full h-80 p-5 focus:outline-none focus:ring-0 border-none text-slate-700 leading-relaxed resize-y bg-white font-sans text-sm" placeholder="Sila masukkan ulasan analisa prestasi, rasional penurunan/peningkatan, dan perancangan strategik 2026-2030 di sini..."></textarea>
+                <textarea id="strategicAnalysisText" class="w-full h-80 p-5 focus:outline-none focus:ring-0 border-none text-slate-700 leading-relaxed resize-y bg-white font-sans text-sm" placeholder="Sila masukkan ulasan analisa prestasi di sini..."></textarea>
             </div>
             <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-wrap justify-between items-center gap-3 no-print">
                 <span id="aiStatusMsg" class="text-xs text-slate-500 font-medium flex items-center">
@@ -381,12 +309,48 @@
     </main>
     
     <footer class="bg-white border-t border-slate-200 py-6 mt-auto no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500" id="footerYearText">
             Disediakan untuk Kegunaan Perancangan Strategik · Kumpulan ANGKASA &copy; 2026
         </div>
     </footer>
 
     <script>
+        // Pengesanan Automatik Tarikh Semasa (Bulan & Tahun Sistem)
+        const now = new Date();
+        const currentYearNum = now.getFullYear(); // Contoh: 2026
+        const monthNames = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+        const currentMonthName = monthNames[now.getMonth()]; // Mengikut bulan peranti semasa (cth: Okt)
+        
+        // Label dinamik untuk bulan semasa (cth: "2026 (Okt)")
+        const currentPeriodLabel = `${currentYearNum} (${currentMonthName})`;
+
+        // Senarai tahun bersejarah dinamik (bermula 2020 sehingga tahun semasa dengan bulan terkini)
+        let historicalYearsList = ['2020', '2021', '2022', '2023', '2024', '2025'];
+        if(currentYearNum > 2025) {
+            historicalYearsList.push(currentPeriodLabel);
+        } else {
+            // Jika tahun sistem sebelum 2026, guna format semasa
+            historicalYearsList.push(currentPeriodLabel);
+        }
+
+        // Senarai tahun sasaran strategik (5 tahun selepas tahun semasa)
+        let targetYearsList = [];
+        for(let i = 1; i <= 5; i++) {
+            targetYearsList.push((currentYearNum + i).toString());
+        }
+
+        // Gabungan semua tahun untuk jadual dan carta perbandingan
+        const allYearsList = [...historicalYearsList, ...targetYearsList];
+
+        // Kemaskini teks label pada UI secara automatik
+        document.getElementById('kpi-rev-title').innerText = `Perolehan Terkumpul (2020-${currentPeriodLabel})`;
+        document.getElementById('kpi-prof-title').innerText = `Untung Bersih Terkumpul (2020-${currentPeriodLabel})`;
+        document.getElementById('histChartTitle').innerText = `Prestasi Sebenar (2020 - ${currentPeriodLabel})`;
+        document.getElementById('targetChartTitle').innerText = `Unjuran Strategik (${targetYearsList[0]} - ${targetYearsList[targetYearsList.length-1]})`;
+        document.getElementById('revTableBadgeRange').innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
+        document.getElementById('profTableBadgeRange').innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
+        document.getElementById('footerYearText').innerHTML = `Disediakan untuk Kegunaan Perancangan Strategik &middot; Kumpulan ANGKASA &copy; ${currentYearNum}`;
+
         // Senarai anak syarikat
         const subsidiariesList = [
             "MYANGKASA HOLDINGS SDN BHD",
@@ -403,15 +367,12 @@
             "ANGKASA RESOURCES & CONSULTANCY SDN BHD"
         ];
 
-        // URL Data
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFYnEntAPTCpi-Sw9Hh2N6Hnverlu74OaJ25o8dcIM4wqPEG1H0Am3XR_F3YgBIA/pub?output=csv";
 
-        // Struktur Data Global
         let rawData = [];
         let dashboardData = []; 
         let chartInstances = {};
 
-        // Inisialisasi Senarai Dropdown Filter
         const filterSelect = document.getElementById('subsidiaryFilter');
         subsidiariesList.forEach(sub => {
             const option = document.createElement('option');
@@ -420,20 +381,18 @@
             filterSelect.appendChild(option);
         });
 
-        // ==================== MODAL KUNCI API GEMINI LOGIK ====================
         function openApiKeyModal() {
             const modal = document.getElementById('apiKeyModal');
             const modalBox = document.getElementById('apiKeyModalBox');
             const input = document.getElementById('modalGeminiApiKey');
             const alertBox = document.getElementById('modalStatusAlert');
 
-            // Setkan nilai sedia ada
             const savedKey = localStorage.getItem('geminiApiKey') || '';
             input.value = savedKey;
 
             if(savedKey) {
                 alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
-                alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API sedia disimpan dan sedia digunakan.</span>';
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API sedia disimpan dan aktif.</span>';
                 alertBox.classList.remove('hidden');
             } else {
                 alertBox.classList.add('hidden');
@@ -450,14 +409,10 @@
         function closeApiKeyModal() {
             const modal = document.getElementById('apiKeyModal');
             const modalBox = document.getElementById('apiKeyModalBox');
-
             modalBox.classList.remove('scale-100');
             modalBox.classList.add('scale-95');
             modal.classList.add('opacity-0');
-
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
         }
 
         function toggleApiKeyVisibility() {
@@ -475,24 +430,18 @@
         function saveApiKeyFromModal() {
             const input = document.getElementById('modalGeminiApiKey').value.trim();
             const alertBox = document.getElementById('modalStatusAlert');
-
             if(!input) {
                 alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-amber-50 text-amber-800 border border-amber-200";
                 alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span>Sila masukkan Kunci API sebelum menyimpan.</span>';
                 alertBox.classList.remove('hidden');
                 return;
             }
-
             localStorage.setItem('geminiApiKey', input);
             updateApiKeyUIIndicators();
-
             alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
             alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API Gemini berjaya disimpan!</span>';
             alertBox.classList.remove('hidden');
-
-            setTimeout(() => {
-                closeApiKeyModal();
-            }, 1000);
+            setTimeout(() => { closeApiKeyModal(); }, 1000);
         }
 
         function clearApiKey() {
@@ -502,7 +451,6 @@
             alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200";
             alertBox.innerHTML = '<i class="fa-solid fa-circle-info text-rose-600"></i> <span>Kunci API telah dipadamkan.</span>';
             alertBox.classList.remove('hidden');
-
             updateApiKeyUIIndicators();
         }
 
@@ -510,34 +458,24 @@
             const savedKey = localStorage.getItem('geminiApiKey');
             const indicator = document.getElementById('headerApiKeyIndicator');
             const statusText = document.getElementById('apiKeyStatusText');
-
             if (savedKey && savedKey.length > 5) {
-                if(indicator) {
-                    indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 border border-brand-900 shadow-sm";
-                    indicator.title = "Kunci API Gemini Aktif";
-                }
+                if(indicator) { indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 border border-brand-900 shadow-sm"; }
                 if(statusText) statusText.innerText = "API Gemini: Aktif";
             } else {
-                if(indicator) {
-                    indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900";
-                    indicator.title = "Tiada Kunci API";
-                }
+                if(indicator) { indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900"; }
                 if(statusText) statusText.innerText = "Set Kunci API";
             }
         }
 
-        // Menjana data mock strategik (sekiranya CSV gagal diakses atau kosong)
+        // Penjanaan data simulasi strategik adaptif mengikut tahun semasa
         function generateMockData() {
             let mockData = [];
             subsidiariesList.forEach(sub => {
-                let baseRevenue = Math.random() * 50 + 5; 
-                let profitMargin = (Math.random() * 15 + 2) / 100;
+                let baseRevenue = Math.random() * 50 + 10; 
+                let profitMargin = (Math.random() * 15 + 3) / 100;
                 
-                const histYears = [2020, 2021, 2022, 2023, 2024, 2025, '2026 (Jul)'];
-                histYears.forEach((year, index) => {
-                    let growth = (index < 2) ? (Math.random() * 0.1 - 0.15) : (Math.random() * 0.15 + 0.02);
-                    if(year === '2026 (Jul)') growth = -0.4;
-
+                historicalYearsList.forEach((year, index) => {
+                    let growth = (index < 2) ? (Math.random() * 0.1 - 0.05) : (Math.random() * 0.15 + 0.03);
                     let currentRev = baseRevenue * (1 + growth);
                     let currentProf = currentRev * profitMargin;
                     let currentDiv = currentProf > 0 ? currentProf * (Math.random() * 0.2 + 0.2) : 0;
@@ -546,14 +484,13 @@
                         Syarikat: sub, Tahun: year, Kategori: 'Sebenar',
                         Perolehan: currentRev, UntungBersih: currentProf, Dividen: currentDiv
                     });
-                    baseRevenue = year === '2026 (Jul)' ? baseRevenue * 1.05 : currentRev;
+                    baseRevenue = currentRev;
                 });
 
-                const targetYears = [2026, 2027, 2028, 2029, 2030];
-                targetYears.forEach(year => {
-                    let growth = Math.random() * 0.08 + 0.05; 
+                targetYearsList.forEach(year => {
+                    let growth = Math.random() * 0.09 + 0.04; 
                     let targetRev = baseRevenue * (1 + growth);
-                    let targetProfMargin = profitMargin * 1.1;
+                    let targetProfMargin = profitMargin * 1.05;
                     let targetProf = targetRev * targetProfMargin;
 
                     mockData.push({
@@ -576,21 +513,15 @@
                     skipEmptyLines: true,
                     complete: function(results) {
                         if(results.data && results.data.length > 0) {
-                            const sample = results.data[0];
-                            const keys = Object.keys(sample).join(' ').toLowerCase();
-                            if(keys.includes('syarikat') || keys.includes('perolehan') || keys.includes('untung')) {
-                                mapCsvToDashboardFormat(results.data);
-                                document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800";
-                                document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-check-circle"></i> Data Google Sheets Dimuatkan';
-                            } else {
-                                fallbackToMock("Format CSV tidak bertepatan, menggunakan data simulasi strategik.");
-                            }
+                            mapCsvToDashboardFormat(results.data);
+                            document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800";
+                            document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-check-circle"></i> Data Google Sheets Dimuatkan';
                         } else {
-                            fallbackToMock("CSV Kosong, menggunakan data simulasi strategik.");
+                            fallbackToMock("Format CSV kosong, menggunakan data simulasi.");
                         }
                     },
-                    error: function(error) {
-                        fallbackToMock("Gagal akses CSV, menggunakan data simulasi.");
+                    error: function() {
+                        fallbackToMock("Gagal akses CSV, menggunakan data simulasi automatik.");
                     }
                 });
             } catch (err) {
@@ -609,7 +540,7 @@
             console.warn(message);
             dashboardData = generateMockData();
             document.getElementById('dataStatusBadge').className = "inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800";
-            document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-database"></i> Data Simulasi (Sandbox Mode)';
+            document.getElementById('dataStatusBadge').innerHTML = '<i class="fa-solid fa-database"></i> Data Simulasi Dinamik (Aktif)';
             processAndRenderDashboard('ALL');
         }
 
@@ -625,10 +556,16 @@
                 let untungKey = findKey(['untung', 'profit', 'pat', 'net']) || keys[4];
                 let dividenKey = findKey(['dividen', 'dividend']) || keys[5];
 
+                let rawTahun = row[tahunKey] ? row[tahunKey].toString() : '';
+                // Jika data CSV merujuk tahun semasa, tukar kepada label semasa dinamik
+                if(rawTahun.includes('2026') && rawTahun.includes('Jul')) {
+                    rawTahun = currentPeriodLabel;
+                }
+
                 return {
                     Syarikat: row[syarikatKey],
-                    Tahun: row[tahunKey] ? row[tahunKey].toString() : '',
-                    Kategori: row[kategoriKey] ? row[kategoriKey].toString() : (row[tahunKey] >= 2026 && row[tahunKey] !== '2026 (Jul)' ? 'Sasaran' : 'Sebenar'),
+                    Tahun: rawTahun,
+                    Kategori: row[kategoriKey] ? row[kategoriKey].toString() : 'Sebenar',
                     Perolehan: parseFloat(row[perolehanKey]) || 0,
                     UntungBersih: parseFloat(row[untungKey]) || 0,
                     Dividen: parseFloat(row[dividenKey]) || 0
@@ -652,8 +589,8 @@
                 activeData = dashboardData.filter(d => d.Syarikat.includes(filterSyarikat) || filterSyarikat.includes(d.Syarikat));
             }
 
-            const actualData = activeData.filter(d => ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Jul)'].includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sebenar'));
-            const targetData = activeData.filter(d => ['2026', '2027', '2028', '2029', '2030'].includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sasaran'));
+            const actualData = activeData.filter(d => historicalYearsList.includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sebenar'));
+            const targetData = activeData.filter(d => targetYearsList.includes(d.Tahun.toString()) || d.Kategori.toLowerCase().includes('sasaran'));
 
             let totalActualRev = 0; let totalActualProf = 0; let totalDiv = 0;
             actualData.forEach(d => {
@@ -684,8 +621,6 @@
             if(chartInstances.companyProfit) chartInstances.companyProfit.destroy();
 
             const ctxCompany = document.getElementById('companyProfitChart').getContext('2d');
-            const allYears = ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Jul)', '2026', '2027', '2028', '2029', '2030'];
-            
             const colorPalette = [
                 '#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#6366f1',
                 '#14b8a6', '#f97316', '#84cc16', '#06b6d4', '#a855f7', '#64748b'
@@ -697,7 +632,7 @@
             }
 
             const datasets = activeCompanies.map((company, index) => {
-                const dataPoints = allYears.map(year => {
+                const dataPoints = allYearsList.map(year => {
                     const row = dashboardData.find(d => 
                         (d.Syarikat === company || d.Syarikat.includes(company)) && 
                         d.Tahun.toString() === year.toString()
@@ -723,7 +658,7 @@
             chartInstances.companyProfit = new Chart(ctxCompany, {
                 type: 'line',
                 data: {
-                    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Julai)', '2026 (S)', '2027 (S)', '2028 (S)', '2029 (S)', '2030 (S)'],
+                    labels: allYearsList,
                     datasets: datasets
                 },
                 options: {
@@ -746,8 +681,23 @@
         }
 
         function renderFinancialTables() {
-            const allYears = ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Jul)', '2026', '2027', '2028', '2029', '2030'];
+            const revThead = document.getElementById('revenueTableHead');
+            const profThead = document.getElementById('profitTableHead');
             
+            let headerHtml = `<tr><th scope="col" class="py-3 px-4 font-bold sticky left-0 bg-slate-100 z-10">Anak Syarikat</th>`;
+            historicalYearsList.forEach((y, idx) => {
+                let isCurrent = (idx === historicalYearsList.length - 1);
+                let bgCls = isCurrent ? 'bg-blue-50 text-blue-900' : '';
+                headerHtml += `<th scope="col" class="py-3 px-3 text-right ${bgCls}">${y}</th>`;
+            });
+            targetYearsList.forEach(y => {
+                headerHtml += `<th scope="col" class="py-3 px-3 text-right bg-purple-50 text-purple-900">${y} (S)</th>`;
+            });
+            headerHtml += `</tr>`;
+
+            revThead.innerHTML = headerHtml;
+            profThead.innerHTML = headerHtml;
+
             const revTbody = document.getElementById('revenueTableBody');
             const revTfoot = document.getElementById('revenueTableFoot');
             const profTbody = document.getElementById('profitTableBody');
@@ -758,13 +708,13 @@
 
             let yearTotalsRev = {};
             let yearTotalsProf = {};
-            allYears.forEach(y => { yearTotalsRev[y] = 0; yearTotalsProf[y] = 0; });
+            allYearsList.forEach(y => { yearTotalsRev[y] = 0; yearTotalsProf[y] = 0; });
 
             subsidiariesList.forEach(company => {
                 let revRowHtml = `<td class="py-3 px-4 font-semibold text-slate-800 sticky left-0 bg-white shadow-sm border-r border-slate-100">${company}</td>`;
                 let profRowHtml = `<td class="py-3 px-4 font-semibold text-slate-800 sticky left-0 bg-white shadow-sm border-r border-slate-100">${company}</td>`;
 
-                allYears.forEach(year => {
+                allYearsList.forEach(year => {
                     const dataRow = dashboardData.find(d => 
                         (d.Syarikat === company || d.Syarikat.includes(company)) && 
                         d.Tahun.toString() === year.toString()
@@ -776,10 +726,11 @@
                     yearTotalsRev[year] += rev;
                     yearTotalsProf[year] += prof;
 
-                    let yearBgClass = year === '2026 (Jul)' ? 'bg-blue-50/50' : (['2026','2027','2028','2029','2030'].includes(year) ? 'bg-purple-50/30' : '');
+                    let isCurrCol = (year === currentPeriodLabel);
+                    let isTargetCol = targetYearsList.includes(year);
+                    let yearBgClass = isCurrCol ? 'bg-blue-50/50' : (isTargetCol ? 'bg-purple-50/30' : '');
 
                     revRowHtml += `<td class="py-2.5 px-3 text-right ${yearBgClass}">${formatRM(rev)}</td>`;
-
                     let profClass = prof < 0 ? 'text-rose-600 font-semibold' : (prof > 0 ? 'text-slate-700' : 'text-slate-400');
                     profRowHtml += `<td class="py-2.5 px-3 text-right ${yearBgClass} ${profClass}">${formatRM(prof)}</td>`;
                 });
@@ -798,10 +749,12 @@
             let revFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
             let profFootHtml = `<td class="py-3 px-4 sticky left-0 bg-slate-100 border-r border-slate-200">JUMLAH KESELURAHAN (RM JUTA)</td>`;
 
-            allYears.forEach(year => {
-                let yearBgClass = year === '2026 (Jul)' ? 'bg-blue-100/60' : (['2026','2027','2028','2029','2030'].includes(year) ? 'bg-purple-100/60' : '');
+            allYearsList.forEach(year => {
+                let isCurrCol = (year === currentPeriodLabel);
+                let isTargetCol = targetYearsList.includes(year);
+                let yearBgClass = isCurrCol ? 'bg-blue-100/60' : (isTargetCol ? 'bg-purple-100/60' : '');
+                
                 revFootHtml += `<td class="py-3 px-3 text-right ${yearBgClass}">${formatRM(yearTotalsRev[year])}</td>`;
-
                 let profVal = yearTotalsProf[year];
                 let profClass = profVal < 0 ? 'text-rose-700 font-bold' : 'text-emerald-700 font-bold';
                 profFootHtml += `<td class="py-3 px-3 text-right ${yearBgClass} ${profClass}">${formatRM(profVal)}</td>`;
@@ -826,11 +779,8 @@
                 return res;
             };
 
-            const histYears = ['2020', '2021', '2022', '2023', '2024', '2025', '2026 (Jul)'];
-            const histAgg = aggByYear(actualData, histYears);
-
-            const targetYears = ['2026', '2027', '2028', '2029', '2030'];
-            const targetAgg = aggByYear(targetData, targetYears);
+            const histAgg = aggByYear(actualData, historicalYearsList);
+            const targetAgg = aggByYear(targetData, targetYearsList);
 
             Chart.defaults.font.family = "'Inter', sans-serif";
             Chart.defaults.color = '#64748b';
@@ -869,7 +819,7 @@
             
             let compLabels = []; let compData = [];
             if(filterStatus === 'ALL') {
-                let latestData = actualData.filter(d => d.Tahun === '2025' || d.Tahun === '2026 (Jul)');
+                let latestData = actualData.filter(d => d.Tahun === '2025' || d.Tahun === currentPeriodLabel);
                 let groupComp = {};
                 latestData.forEach(d => { groupComp[d.Syarikat] = (groupComp[d.Syarikat] || 0) + d.Perolehan; });
                 let sortComp = Object.entries(groupComp).sort((a,b) => b[1] - a[1]);
@@ -919,27 +869,22 @@
         }
 
         function generateDefaultAnalysis() {
-            const currentDate = "Julai 2026";
-            const defaultText = `LAPORAN ANALISA STRATEGIK PRESTASI KUMPULAN ANGKASA (KEMASKINI: ${currentDate})
+            const defaultText = `LAPORAN ANALISA STRATEGIK PRESTASI KUMPULAN ANGKASA (KEMASKINI: ${currentPeriodLabel})
 
-1. PRESTASI SEMASA (2020 - ${currentDate}):
-• Perolehan Kumpulan mencatatkan trend pertumbuhan yang positif pasca-pandemik, didorong terutamanya oleh sektor Perkhidmatan dan Perdagangan.
-• Margin Untung Bersih kekal di tahap yang kompetitif walaupun berdepan dengan peningkatan kos bahan mentah dan cabaran ekonomi global.
-• Prestasi setakat Julai 2026 menunjukkan momentum yang kukuh untuk mencapai sasaran tahunan penuh.
+1. PRESTASI SEMASA (2020 - ${currentPeriodLabel}):
+• Perolehan Kumpulan mencatatkan pertumbuhan yang mantap berlandaskan aktiviti perniagaan terkini.
+• Margin Untung Bersih kekal berdaya saing merentasi pelbagai sektor anak syarikat.
+• Prestasi setakat ${currentPeriodLabel} menunjukkan momentum positif ke arah pencapaian akhir tahun penuh.
 
 2. AGIHAN DAN POLISI DIVIDEN:
-• Anak-anak syarikat terus komited dalam memberikan pulangan pelaburan melalui polisi dividen yang konsisten.
-• Aliran tunai operasi yang sihat membolehkan pembayaran dividen dikekalkan pada paras memuaskan tanpa menjejaskan keperluan perbelanjaan modal (CAPEX).
+• Anak-anak syarikat komited memberikan pulangan mampan melalui pembayaran dividen yang konsisten.
+• Aliran tunai operasi yang sihat menyokong keperluan modal tanpa menjejaskan pelaburan strategik (CAPEX).
 
-3. UNJURAN & HALA TUJU STRATEGIK (2026 - 2030):
-• Berdasarkan trajektori unjuran, sasaran perolehan untuk tempoh lima (5) tahun akan datang menjangkakan pertumbuhan Purata Kadar Pertumbuhan Tahunan Kompaun (CAGR) yang agresif.
-• Fokus strategik:
-   a) Inovasi dan transformasi digital merentas MyANGKASA Services & Holdings.
-   b) Optimalisasi kos operasi dan sinergi rantaian bekalan antara anak syarikat.
-   c) Penerokaan segmen baharu dalam Green Technology dan Keterjaminan Makanan (Livestock & Dairy).
+3. UNJURAN & HALA TUJU STRATEGIK (${targetYearsList[0]} - ${targetYearsList[targetYearsList.length-1]}):
+• Sasaran unjuran tempoh lima tahun ke hadapan menunjukkan pertumbuhan positif berasaskan strategi transformasi digital dan pengukuhan pasaran teras.
 
 KESIMPULAN:
-Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus memantau struktur kos dan memperhebat usaha penembusan pasaran bagi memastikan unjuran 2026-2030 dapat direalisasikan dengan jayanya.`;
+Pengurusan Kumpulan ANGKASA disaran untuk terus memantau kecekapan kos dan meneroka peluang perniagaan baharu bagi memastikan sasaran strategik tercapai.`;
             
             document.getElementById('strategicAnalysisText').value = defaultText;
         }
@@ -947,8 +892,6 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
         function saveAnalysis() {
             const text = document.getElementById('strategicAnalysisText').value;
             localStorage.setItem('angkasaUlasanAnalisa', text);
-            
-            // Visual feedback
             const statusMsg = document.getElementById('aiStatusMsg');
             statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-floppy-disk mr-1"></i> Ulasan disimpan secara tempatan!</span>';
             setTimeout(() => {
@@ -956,7 +899,6 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
             }, 3000);
         }
 
-        // Penjana Ulasan Berasaskan Data Terkini (Local Engine / Fallback)
         function generateLocalDynamicAnalysis(entityName) {
             const revHist = document.getElementById('kpi-revenue-hist').innerText;
             const profHist = document.getElementById('kpi-profit-hist').innerText;
@@ -967,31 +909,17 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
             const isAll = entityName === 'ALL';
             const entityTitle = isAll ? "KESELURUHAN KUMPULAN ANGKASA" : entityName;
 
-            let report = `LAPORAN ANALISA STRATEGIK PRESTASI & UNJURAN EKSEKUTIF\nENTITI: ${entityTitle}\nTARIKH SEMAKAN: JULAI 2026\n\n`;
-
-            report += `1. PRESTASI SEBENAR TERKUMPUL (2020 - JULAI 2026):\n`;
+            let report = `LAPORAN ANALISA STRATEGIK PRESTASI & UNJURAN EKSEKUTIF\nENTITI: ${entityTitle}\nTARIKH SEMAKAN: ${currentPeriodLabel.toUpperCase()}\n\n`;
+            report += `1. PRESTASI SEBENAR TERKUMPUL (2020 - ${currentPeriodLabel.toUpperCase}):\n`;
             report += `• Jumlah Perolehan Terkumpul: ${revHist} Juta.\n`;
-            report += `• Untung Bersih Terkumpul: ${profHist} Juta (${marginText}).\n`;
-            report += `• Prestasi operasi menunjukkan trajektori pertumbuhan yang mampan, di mana pemulihan perniagaan kelihatan kukuh pasca 2021. Peningkatan volum perniagaan secara konsisten menyumbang kepada margin bersih yang berdaya tahan.\n\n`;
-
-            report += `2. ANALISA AGIHAN DIVIDEN & PULANGAN PELABURAN:\n`;
-            report += `• Jumlah Dividen Disalurkan: ${divTotal} Juta.\n`;
-            report += `• Agihan dividen mencerminkan komitmen berterusan terhadap pemegang saham, disokong oleh ketersediaan aliran tunai bebas operasi yang positif.\n\n`;
-
-            report += `3. UNJURAN STRATEGIK & HALA TUJU (2026 - 2030):\n`;
-            report += `• Sasaran Perolehan Purata Setahun (2026-2030): ${targetRev}.\n`;
-            report += `• Bagi mencapai unjuran 5 tahun akan datang, fokus strategik keutamaan merangkumi:\n`;
-            report += `   a) Peluasan pasaran sasaran dan sinergi perniagaan rentas entiti Kumpulan.\n`;
-            report += `   b) Kecekapan modal insan serta automasi proses operasi untuk mengekalkan nisbah kos-kepada-pendapatan yang sihat.\n`;
-            report += `   c) Kawalan risiko kredit dan pemantauan aliran tunai bagi memastikan sasaran dividen berterusan.\n\n`;
-
-            report += `KESIMPULAN & CADANGAN TINDAKAN:\n`;
-            report += `Secara kesimpulannya, prestasi kewangan ${entityTitle} berada di landasan yang betul. Jawatankuasa Pengurusan disyorkan untuk melaksanakan semakan KPI secara berkala serta mengurangkan ketidakcekapan operasi bagi merealisasikan sasaran 2026-2030.`;
-
+            report += `• Untung Bersih Terkumpul: ${profHist} Juta (${marginText}).\n\n`;
+            report += `2. ANALISA AGIHAN DIVIDEN:\n`;
+            report += `• Jumlah Dividen Disalurkan: ${divTotal} Juta.\n\n`;
+            report += `3. UNJURAN STRATEGIK (${targetYearsList[0]} - ${targetYearsList[targetYearsList.length-1]}):\n`;
+            report += `• Sasaran Perolehan Purata Setahun: ${targetRev}.\n`;
             return report;
         }
 
-        // Fungsi Penjanaan Ulasan Automatik Menggunakan Gemini API
         async function generateAIAnalysis() {
             const btn = document.getElementById('btnAiGenerate');
             const textarea = document.getElementById('strategicAnalysisText');
@@ -1000,70 +928,59 @@ Lembaga Pengarah dan Jawatankuasa Pengurusan Strategik disaran untuk terus meman
             const apiKeyInput = (localStorage.getItem('geminiApiKey') || '').trim();
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Menganalisis Data...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Menganalisis...';
             statusMsg.innerHTML = '<span class="text-purple-600 font-medium"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sedang menjana ulasan analitikal...</span>';
 
             try {
                 if (apiKeyInput) {
-                    // Menggunakan Gemini API jika Kunci API telah disimpan
                     const revenueHist = document.getElementById('kpi-revenue-hist').innerText;
                     const profitHist = document.getElementById('kpi-profit-hist').innerText;
                     const marginHist = document.getElementById('kpi-margin').innerText;
                     const targetRev = document.getElementById('kpi-revenue-target').innerText;
                     const divTotal = document.getElementById('kpi-dividend').innerText;
 
-                    const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi berikut bagi entiti: "${selectedEntity}".
-Ringkasan Data Metrik:
-- Perolehan Terkumpul (2020-2026 Jul): ${revenueHist}
+                    const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi bagi entiti: "${selectedEntity}" sehingga ${currentPeriodLabel}.
+Ringkasan Data:
+- Perolehan Terkumpul: ${revenueHist}
 - Untung Bersih Terkumpul: ${profitHist} (${marginHist})
-- Sasaran Perolehan Purata Setahun (2026-2030): ${targetRev}
+- Sasaran Perolehan Purata Setahun: ${targetRev}
 - Jumlah Dividen Dibayar: ${divTotal}
 
-Sila sediakan Ulasan Analisa Eksekutif yang profesional, berstruktur, dan relevan dalam Bahasa Melayu. Bahagikan ulasan kepada 3 bahagian utama:
-1. PRESTASI SEBENAR (2020 - 2026 Julai)
-2. PRESTASI DIVIDEN & PULANGAN PELABURAN
-3. UNJURAN STRATEGIK & HALA TUJU (2026 - 2030)
-
-Berikan ulasan yang tajam, rasional perancangan strategik, dan cadangan tindakan (actionable insights).`;
+Sediakan Ulasan Analisa Eksekutif profesional dalam Bahasa Melayu.`;
 
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKeyInput}`;
-
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
                     });
-
                     const result = await response.json();
                     const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
                     if (aiText) {
                         textarea.value = aiText;
                         localStorage.setItem('angkasaUlasanAnalisa', aiText);
-                        statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana secara terus via Gemini AI API!</span>';
+                        statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI API!</span>';
                         return;
                     }
                 }
 
-                // Generasi Tempatan jika Kunci API tiada atau tidak lengkap
                 const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
                 textarea.value = generatedReport;
                 localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
-                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik tempatan berjaya dijana. (Sila tambah Kunci API Gemini pada butang Skru/Tetapan untuk AI penuh).</span>';
+                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana berasaskan tarikh semasa.</span>';
 
             } catch (error) {
-                console.warn("AI Generation Fallback Used:", error);
                 const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
                 textarea.value = generatedReport;
                 localStorage.setItem('angkasaUlasanAnalisa', generatedReport);
-                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana berasaskan data semasa.</span>';
+                statusMsg.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan analitikal dinamik berjaya dijana.</span>';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jana Ulasan AI (Serta Merta)</span>';
             }
         }
 
-        // Mulakan proses semasa halaman dimuatkan
         window.onload = function() {
             initDashboard();
         };
