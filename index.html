@@ -35,7 +35,6 @@
             .no-print { display: none !important; }
             .glass-card { box-shadow: none; border: 1px solid #e2e8f0; break-inside: avoid; }
         }
-        .modal-animate { transition: all 0.25s ease-out; }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
@@ -53,11 +52,10 @@
             </div>
             
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="openApiKeyModal()" title="Tetapan Kunci API Gemini" class="bg-brand-800 hover:bg-brand-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2 border border-brand-700 shadow-sm relative group">
-                    <i class="fa-solid fa-gear text-lg group-hover:rotate-45 transition-transform duration-300"></i>
-                    <span class="hidden sm:inline">Tetapan API</span>
-                    <span id="headerApiKeyIndicator" class="w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900" title="Status API"></span>
-                </button>
+                <div class="flex items-center space-x-2 bg-brand-800/80 px-3 py-1.5 rounded-lg border border-brand-700 text-xs text-brand-100">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="headerLiveStatus">AI & Data Aktif</span>
+                </div>
 
                 <button onclick="window.print()" class="bg-brand-700 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center space-x-2 shadow-sm">
                     <i class="fa-solid fa-print"></i>
@@ -66,59 +64,6 @@
             </div>
         </div>
     </header>
-
-    <div id="apiKeyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden modal-animate opacity-0">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden transform scale-95 transition-all duration-200" id="apiKeyModalBox">
-            <div class="bg-gradient-to-r from-brand-900 to-brand-800 px-6 py-4 text-white flex justify-between items-center">
-                <div class="flex items-center space-x-2.5">
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-md">
-                        <i class="fa-solid fa-key text-amber-300"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-base">Tetapan Kunci API Gemini</h3>
-                        <p class="text-xs text-brand-100">Integrasi Kecerdasan Buatan (AI)</p>
-                    </div>
-                </div>
-                <button onclick="closeApiKeyModal()" class="text-slate-300 hover:text-white transition p-1 rounded-lg hover:bg-white/10">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    Masukkan Kunci API Google Gemini anda untuk membolehkan penjanaan ulasan analitikal eksekutif secara automatik menggunakan model AI.
-                </p>
-
-                <div class="space-y-1.5">
-                    <label for="modalGeminiApiKey" class="block text-xs font-semibold text-slate-700">Kunci API Gemini:</label>
-                    <div class="relative">
-                        <input type="password" id="modalGeminiApiKey" placeholder="AIzaSy..." class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block p-3 pr-10 transition">
-                        <button type="button" onclick="toggleApiKeyVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-slate-500 flex items-center justify-between mt-1">
-                        <span><i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Disimpan secara selamat dalam storan peranti.</span>
-                    </p>
-                </div>
-
-                <div id="modalStatusAlert" class="hidden p-3 rounded-xl text-xs font-medium flex items-center space-x-2"></div>
-            </div>
-
-            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-between items-center gap-2">
-                <button type="button" onclick="clearApiKey()" class="px-3.5 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition border border-rose-200">
-                    <i class="fa-solid fa-trash-can mr-1"></i> Padam Kunci
-                </button>
-                <div class="flex space-x-2">
-                    <button type="button" onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-lg transition">Batal</button>
-                    <button type="button" onclick="saveApiKeyFromModal()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-700 hover:bg-brand-800 rounded-lg transition shadow-sm flex items-center space-x-1.5">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Simpan Kunci</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
         
@@ -277,11 +222,7 @@
                     <i class="fa-solid fa-pen-to-square mr-2 text-purple-400"></i> Ruang Ulasan Analisa Eksekutif
                 </h2>
                 <div class="flex items-center space-x-3 no-print">
-                    <button onclick="openApiKeyModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-600 flex items-center space-x-1.5 transition">
-                        <i class="fa-solid fa-gear text-amber-400"></i>
-                        <span id="apiKeyStatusText">Kunci API Gemini</span>
-                    </button>
-                    <span class="text-xs text-slate-400">Mod Sunting & AI</span>
+                    <span class="text-xs text-slate-400"><i class="fa-solid fa-wand-magic-sparkles text-purple-400 mr-1"></i> AI Powered by Gemini</span>
                 </div>
             </div>
             <div class="p-0">
@@ -311,12 +252,17 @@
     </footer>
 
     <script>
+        // Kunci API Gemini ditetapkan secara hardcoded di latar belakang
+        const GEMINI_API_KEY = ""; // Sedia menggunakan kunci asal platform Canvas secara automatik
+
+        // Logik Automasi Tarikh Semasa: Mengambil BULAN SEBELUMNYA berbanding tarikh semasa peranti
         const now = new Date();
+        now.setMonth(now.getMonth() - 1); // Tolak 1 bulan (Cth: Okt -> Sep)
         const currentYearNum = now.getFullYear(); 
         const monthNames = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
         const currentMonthName = monthNames[now.getMonth()]; 
         
-        const currentPeriodLabel = `${currentYearNum} (${currentMonthName})`;
+        const currentPeriodLabel = `${currentYearNum} (${currentMonthName})`; // Cth: 2026 (Sep)
 
         let historicalYearsList = ['2020', '2021', '2022', '2023', '2024', '2025', currentPeriodLabel];
 
@@ -343,7 +289,7 @@
             const profBadgeEl = document.getElementById('profTableBadgeRange');
             if(profBadgeEl) profBadgeEl.innerText = `2020 - ${targetYearsList[targetYearsList.length-1]}`;
             const footerEl = document.getElementById('footerYearText');
-            if(footerEl) footerEl.innerHTML = `Disediakan untuk Kegunaan Perancangan Strategik &middot; Kumpulan ANGKASA &copy; ${currentYearNum}`;
+            if(footerEl) footerEl.innerHTML = `Disediakan untuk Kegunaan Perancangan Strategik &middot; Kumpulan ANGKASA &copy; ${new Date().getFullYear()}`;
         });
 
         const subsidiariesList = [
@@ -374,104 +320,6 @@
                 option.textContent = sub;
                 filterSelect.appendChild(option);
             });
-        }
-
-        function openApiKeyModal() {
-            const modal = document.getElementById('apiKeyModal');
-            const modalBox = document.getElementById('apiKeyModalBox');
-            const input = document.getElementById('modalGeminiApiKey');
-            const alertBox = document.getElementById('modalStatusAlert');
-
-            const savedKey = localStorage.getItem('geminiApiKey') || '';
-            if(input) input.value = savedKey;
-
-            if(savedKey && alertBox) {
-                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
-                alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API sedia disimpan dan aktif.</span>';
-                alertBox.classList.remove('hidden');
-            } else if(alertBox) {
-                alertBox.classList.add('hidden');
-            }
-
-            if(modal && modalBox) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modalBox.classList.remove('scale-95');
-                    modalBox.classList.add('scale-100');
-                }, 10);
-            }
-        }
-
-        function closeApiKeyModal() {
-            const modal = document.getElementById('apiKeyModal');
-            const modalBox = document.getElementById('apiKeyModalBox');
-            if(modal && modalBox) {
-                modalBox.classList.remove('scale-100');
-                modalBox.classList.add('scale-95');
-                modal.classList.add('opacity-0');
-                setTimeout(() => { modal.classList.add('hidden'); }, 200);
-            }
-        }
-
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('modalGeminiApiKey');
-            const icon = document.getElementById('eyeIcon');
-            if (input && icon) {
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.className = 'fa-solid fa-eye-slash';
-                } else {
-                    input.type = 'password';
-                    icon.className = 'fa-solid fa-eye';
-                }
-            }
-        }
-
-        function saveApiKeyFromModal() {
-            const inputEl = document.getElementById('modalGeminiApiKey');
-            const alertBox = document.getElementById('modalStatusAlert');
-            const input = inputEl ? inputEl.value.trim() : '';
-            if(!input && alertBox) {
-                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-amber-50 text-amber-800 border border-amber-200";
-                alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span>Sila masukkan Kunci API sebelum menyimpan.</span>';
-                alertBox.classList.remove('hidden');
-                return;
-            }
-            localStorage.setItem('geminiApiKey', input);
-            updateApiKeyUIIndicators();
-            if(alertBox) {
-                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
-                alertBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Kunci API Gemini berjaya disimpan!</span>';
-                alertBox.classList.remove('hidden');
-            }
-            setTimeout(() => { closeApiKeyModal(); }, 1000);
-        }
-
-        function clearApiKey() {
-            localStorage.removeItem('geminiApiKey');
-            const inputEl = document.getElementById('modalGeminiApiKey');
-            if(inputEl) inputEl.value = '';
-            const alertBox = document.getElementById('modalStatusAlert');
-            if(alertBox) {
-                alertBox.className = "p-3 rounded-xl text-xs font-medium flex items-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200";
-                alertBox.innerHTML = '<i class="fa-solid fa-circle-info text-rose-600"></i> <span>Kunci API telah dipadamkan.</span>';
-                alertBox.classList.remove('hidden');
-            }
-            updateApiKeyUIIndicators();
-        }
-
-        function updateApiKeyUIIndicators() {
-            const savedKey = localStorage.getItem('geminiApiKey');
-            const indicator = document.getElementById('headerApiKeyIndicator');
-            const statusText = document.getElementById('apiKeyStatusText');
-            if (savedKey && savedKey.length > 5) {
-                if(indicator) indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 border border-brand-900 shadow-sm";
-                if(statusText) statusText.innerText = "API Gemini: Aktif";
-            } else {
-                if(indicator) indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-400 border border-brand-900";
-                if(statusText) statusText.innerText = "Set Kunci API";
-            }
         }
 
         function generateMockData() {
@@ -510,7 +358,6 @@
         }
 
         async function initDashboard() {
-            updateApiKeyUIIndicators();
             try {
                 Papa.parse(csvUrl, {
                     download: true,
@@ -571,7 +418,7 @@
                 let dividenKey = findKey(['dividen', 'dividend']) || keys[5];
 
                 let rawTahun = row[tahunKey] ? row[tahunKey].toString() : '';
-                if(rawTahun && (rawTahun.includes('2026') || rawTahun.includes(currentYearNum.toString())) && (rawTahun.includes('Jul') || rawTahun.includes('Julai') || rawTahun.includes('Okt') || rawTahun.includes('Jun'))) {
+                if(rawTahun && (rawTahun.includes(currentYearNum.toString()))) {
                     rawTahun = currentPeriodLabel;
                 }
 
@@ -976,7 +823,6 @@ Pengurusan Kumpulan ANGKASA disaran untuk terus memantau kecekapan kos dan mener
             const statusMsg = document.getElementById('aiStatusMsg');
             const filterEl = document.getElementById('subsidiaryFilter');
             const selectedEntity = filterEl ? filterEl.value : 'ALL';
-            const apiKeyInput = (localStorage.getItem('geminiApiKey') || '').trim();
 
             if(btn) {
                 btn.disabled = true;
@@ -985,14 +831,13 @@ Pengurusan Kumpulan ANGKASA disaran untuk terus memantau kecekapan kos dan mener
             if(statusMsg) statusMsg.innerHTML = '<span class="text-purple-600 font-medium"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Sedang menjana ulasan analitikal...</span>';
 
             try {
-                if (apiKeyInput) {
-                    const revenueHist = document.getElementById('kpi-revenue-hist')?.innerText || '';
-                    const profitHist = document.getElementById('kpi-profit-hist')?.innerText || '';
-                    const marginHist = document.getElementById('kpi-margin')?.innerText || '';
-                    const targetRev = document.getElementById('kpi-revenue-target')?.innerText || '';
-                    const divTotal = document.getElementById('kpi-dividend')?.innerText || '';
+                const revenueHist = document.getElementById('kpi-revenue-hist')?.innerText || '';
+                const profitHist = document.getElementById('kpi-profit-hist')?.innerText || '';
+                const marginHist = document.getElementById('kpi-margin')?.innerText || '';
+                const targetRev = document.getElementById('kpi-revenue-target')?.innerText || '';
+                const divTotal = document.getElementById('kpi-dividend')?.innerText || '';
 
-                    const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi bagi entiti: "${selectedEntity}" sehingga ${currentPeriodLabel}.
+                const userPrompt = `Bertindak sebagai Pengurus Perancangan Strategik Kumpulan ANGKASA. Analisis data prestasi bagi entiti: "${selectedEntity}" sehingga ${currentPeriodLabel}.
 Ringkasan Data:
 - Perolehan Terkumpul: ${revenueHist}
 - Untung Bersih Terkumpul: ${profitHist} (${marginHist})
@@ -1001,21 +846,20 @@ Ringkasan Data:
 
 Sediakan Ulasan Analisa Eksekutif profesional dalam Bahasa Melayu.`;
 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKeyInput}`;
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
-                    });
-                    const result = await response.json();
-                    const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${GEMINI_API_KEY}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
+                });
+                const result = await response.json();
+                const aiText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                    if (aiText && textarea) {
-                        textarea.value = aiText;
-                        localStorage.setItem('angkasaUlasanAnalisa', aiText);
-                        if(statusMsg) statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI API!</span>';
-                        return;
-                    }
+                if (aiText && textarea) {
+                    textarea.value = aiText;
+                    localStorage.setItem('angkasaUlasanAnalisa', aiText);
+                    if(statusMsg) statusMsg.innerHTML = '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Ulasan berjaya dijana via Gemini AI!</span>';
+                    return;
                 }
 
                 const generatedReport = generateLocalDynamicAnalysis(selectedEntity);
